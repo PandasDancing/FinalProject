@@ -135,7 +135,7 @@ The user moves a monkey around the board trying to knock balls into a cone
 			// create the avatar
 			avatarCam = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 1000 );
 			avatar = createAvatar();
-			avatar.translateY(20);
+			avatar.translateY(2);
 			avatarCam.translateY(0);
 			avatarCam.translateZ(10);
 			scene.add(avatar);
@@ -463,16 +463,16 @@ scene.add( mesh )
 	}
 
 	function createAvatar(){
-					var geometry = new THREE.BoxGeometry( 3, 3, 6);
+					var geometry = new THREE.BoxGeometry( 4, 4, 6);
 					var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
-					var pmaterial = new Physijs.createMaterial(material,0.9,0.05);
+					var pmaterial = new Physijs.createMaterial(material,0.9,0.01);
 					pmaterial.visible = false;
 					var mesh = new Physijs.BoxMesh( geometry, pmaterial );
 					mesh.setDamping(0.1,0.1);
 					mesh.castShadow = true;
 
-					avatarCam.position.set(0,8,0);
-					avatarCam.lookAt(0,7,10);
+					avatarCam.position.set(0,2,0);
+					avatarCam.lookAt(0,2,10);
 					mesh.add(avatarCam);
 
 
@@ -740,7 +740,7 @@ scene.add( mesh )
 
     if (controls.reset){
       avatar.__dirtyPosition = true;
-      avatar.position.set(40,10,40);
+      avatar.position.set(40,0,40);
     }
 
 	}
