@@ -590,13 +590,14 @@ scene.add( mesh )
 
 	function createSheeps(){
 
-	var geometry = new THREE.BoxGeometry( 2, 2, 6);
+	var geometry = new THREE.BoxGeometry( 1, 1, 6);
 	var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
 	var pmaterial = new Physijs.createMaterial(material,0.9,0.05);
 	pmaterial.visible = false;
 	var mesh = new Physijs.BoxMesh( geometry, pmaterial );
 	mesh.setDamping(0.1,0.1);
 	mesh.castShadow = true;
+
 
 	var particleMaterial = new THREE.MeshBasicMaterial();
 	particleMaterial.map = THREE.ImageUtils.loadTexture('../models/SHEEPnew.jpg');
