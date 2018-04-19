@@ -18,7 +18,6 @@ The user moves a monkey around the board trying to knock balls into a cone
 	//var cone;
 	var box;
 
-
 	var endScene, endCamera, endText;
 	var lostScene, lostText;
   var npc, cube;
@@ -121,26 +120,35 @@ The user moves a monkey around the board trying to knock balls into a cone
 			dragcamera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 
 			dragcontrols = new THREE.OrbitControls( dragcamera, renderer.domElement  );
-			dragcamera.position.set( 0, 20, 100 );
+			dragcamera.position.set( 0, 520, 100 );
 			dragcontrols.update();
 
-			// create the ground and the skybox
+			//create the ground and the skybox
 			var ground = createGround('grass.png');
+			//var ground = createGround();
+			//ground.translateZ(5000);
 			scene.add(ground);
-			var skybox = createSkyBox('sky.jpg',1);
+
+			var skybox = createSkyBox();
+			//var skybox = createSkyBox3();
+			skybox.translateY(500);
 			scene.add(skybox);
+
 			var ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.8);// better light
 			scene.add(ambientLight);
 			//createSkyBox3();
 			// create the avatar
 			avatarCam = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 1000 );
 			avatar = createAvatar();
-			avatar.translateY(2);
+			//avatar.translateY(-5000);
+			//avatar.position.set(200,100,100);
 			avatarCam.translateY(0);
 			avatarCam.translateZ(10);
+
+			//avatarCam.lookAt(avatar.position);
+			//bug: change back to avatar cam
 			scene.add(avatar);
 			gameState.camera = avatarCam;
-
 			addSheeps();
 
 			//cone = createConeMesh(4,6);
@@ -323,15 +331,18 @@ The user moves a monkey around the board trying to knock balls into a cone
 
 
 
-	function createGround(image){
+	function createGround(){
 		// creating a textured plane which receives shadows
-		var geometry = new THREE.PlaneGeometry( 180, 180, 128 );
-		var texture = new THREE.TextureLoader().load( '../images/'+image );
-		texture.wrapS = THREE.RepeatWrapping;
-		texture.wrapT = THREE.RepeatWrapping;
-		texture.repeat.set( 15, 15 );
+		 var geometry = new THREE.PlaneGeometry( 1000, 1000, 1000 );
+		// var texture = new THREE.TextureLoader().load( '../images/'+image );
+		// texture.wrapS = THREE.RepeatWrapping;
+		// texture.wrapT = THREE.RepeatWrapping;
+		// texture.repeat.set( 15, 15 );
+		//
+		// var material = new THREE.MeshLambertMaterial( { color: 0xffffff,  map: texture ,side:THREE.DoubleSide} );
+		var material = new THREE.MeshLambertMaterial( { color: 0xffffff} );
+		material.transparent = true;
 
-		var material = new THREE.MeshLambertMaterial( { color: 0xffffff,  map: texture ,side:THREE.DoubleSide} );
 		var pmaterial = new Physijs.createMaterial(material,0.9,1);
 		//var mesh = new THREE.Mesh( geometry, material );
 		var mesh = new Physijs.BoxMesh( geometry, pmaterial, 0 );
@@ -346,6 +357,8 @@ The user moves a monkey around the board trying to knock balls into a cone
 		jsonLoader.load( "models/treetop.js", function (geometry2) {
 			var s = new THREE.Mesh(geometry2, particleMaterial);
 			s.rotateX(Math.PI/2*3);
+			// s.scale.set( 50, 50, 50 );
+			// s.position.set(-1800,-700,-3200);
 			s.scale.set( 0.4, 0.4, 0.4 );
 			s.position.set(25,-25,-15);
 			mesh.add(s);
@@ -360,6 +373,8 @@ The user moves a monkey around the board trying to knock balls into a cone
 		jsonLoader.load( "models/treebody.js", function (geometry2) {
 			var s = new THREE.Mesh(geometry2, particleMaterial2);
 			s.rotateX(Math.PI/2*3);
+			// s.scale.set( 20, 20, 20 );
+			// s.position.set(-2000,-85,0);
 			s.scale.set( 0.1, 0.1, 0.1 );
 			s.position.set(25,-25,0);
 			mesh.add(s);
@@ -374,6 +389,11 @@ The user moves a monkey around the board trying to knock balls into a cone
 			var s = new THREE.Mesh(geometry2, particleMaterial3);
 			var s2 = new THREE.Mesh(geometry2, particleMaterial3);
 			s.rotateX(Math.PI/2*3);
+			// s.scale.set(100, 100, 100 );
+			// s.position.set(500,0,0);
+			// s2.rotateX(Math.PI/2*3);
+			// s2.scale.set( 100, 100, 100 );
+			// s2.position.set(500,60,0);
 			s.scale.set( 2, 2, 2 );
 			s.position.set(30,30,0);
 			s2.rotateX(Math.PI/2*3);
@@ -384,57 +404,40 @@ The user moves a monkey around the board trying to knock balls into a cone
 		}
 		);
 
-		return mesh
-		// we need to rotate the mesh 90 degrees to make it horizontal not vertical
-	}
-
-
-
-	function createSkyBox(image,k){
-		// creating a textured plane which receives shadows
-		var geometry = new THREE.SphereGeometry( 80, 80, 80 );
-		var texture = new THREE.TextureLoader().load( '../images/'+image );
-		texture.wrapS = THREE.RepeatWrapping;
-		texture.wrapT = THREE.RepeatWrapping;
-		texture.repeat.set( k, k );
-		var material = new THREE.MeshLambertMaterial( { color: 0xffffff,  map: texture ,side:THREE.DoubleSide} );
-		//var pmaterial = new Physijs.createMaterial(material,0.9,0.5);
-		//var mesh = new THREE.Mesh( geometry, material );
-		var mesh = new THREE.Mesh( geometry, material, 0 );
-
-		mesh.receiveShadow = false;
 		return mesh;
 		// we need to rotate the mesh 90 degrees to make it horizontal not vertical
 	}
 
-	function createSkyBox3(){
-		var mesh	= THREEx.createSkymap('mars')
-scene.add( mesh )
-console.log(Object.keys(THREEx.TextureCube.WellKnownUrls));
-var textureCube	= THREEx.createTextureCube([
-	'cube_px.jpg', 'cube_nx.jpg',
-	'cube_py.jpg', 'cube_ny.jpg',
-	'cube_pz.jpg', 'cube_nz.jpg',
-])
-var mesh	= THREEx.createSkymap(textureCube)
-scene.add( mesh )
 
-		// var geometry = new THREE.CubeGeometry( 10, 10, 10 );
-		// var cubeMaterials = [
-		// 	new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("images/skybox/front.png"), side: THREE.DoubleSide}),
-		// 	new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("images/skybox/back.png"), side: THREE.DoubleSide}),
-		// 	new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("images/skybox/up.png"), side: THREE.DoubleSide}),
-		// 	new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("images/skybox/down.png"), side: THREE.DoubleSide}),
-		// 	new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("images/skybox/right.png"), side: THREE.DoubleSide}),
-		// 	new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("images/skybox/left.png"), side: THREE.DoubleSide})
-		// ]
-		// var cubeMaterial = new THREE.MeshFaceMaterial(cubeMaterial);
-		//
-		// var cube = new THREE.Mesh(geometry, cubeMaterial);
-		// scene.add(cube);
-		// var ambientLight = new THREE.AmbientLight( 0xFFFFFF, 0.3);
-		// scene.add( ambientLight);
 
+	function createSkyBox(){
+		// creating a textured plane which receives shadows
+		var geometry = new THREE.CubeGeometry( 1000, 1000, 1000 );
+		//var texture = new THREE.TextureLoader().load( '../images/right.jpg');
+		var texture = [
+			new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("images/front.jpg"), side: THREE.DoubleSide}),
+			new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("images/back.jpg"), side: THREE.DoubleSide}),
+			new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("images/up.jpg"), side: THREE.DoubleSide}),
+			new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("images/down.jpg"), side: THREE.DoubleSide}),
+			new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("images/right.jpg"), side: THREE.DoubleSide}),
+			new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("images/left.jpg"), side: THREE.DoubleSide})
+		]
+		// texture.wrapS = THREE.RepeatWrapping;
+		// texture.wrapT = THREE.RepeatWrapping;
+		// texture.repeat.set( 1, 1 );
+		// var material = new THREE.MeshLambertMaterial( { color: 0xffffff,  map: texture ,side:THREE.DoubleSide} );
+		// //var pmaterial = new Physijs.createMaterial(material,0.9,0.5);
+		// //var mesh = new THREE.Mesh( geometry, material );
+		// var mesh = new THREE.Mesh( geometry, material);
+
+		var mesh = new THREE.Mesh(geometry, texture);
+
+		return mesh;
+
+		//return skybox;
+
+		//mesh.receiveShadow = false;
+		//return mesh;
 	}
 
 	function createSkyBox2(image,k){
@@ -481,8 +484,9 @@ scene.add( mesh )
 					particleMaterial.side = THREE.DoubleSide;
 					var jsonLoader = new THREE.JSONLoader();
 					jsonLoader.load( "models/dog.js", function (geometry2) {
-						var fox = new THREE.Mesh(geometry2, particleMaterial);
-						mesh.add(fox);
+						var dog = new THREE.Mesh(geometry2, particleMaterial);
+						//dog.scale.set(1000,1000,1000);
+						mesh.add(dog);
 					}
 				  );
 					//
@@ -511,6 +515,7 @@ scene.add( mesh )
 					var jsonLoader = new THREE.JSONLoader();
 					jsonLoader.load( "models/fox.js", function (geometry2) {
 					var fox = new THREE.Mesh(geometry2, particleMaterial);
+					//fox.scale.set(30,30,30);
 					mesh.add(fox);
 					}
 				  );
@@ -555,6 +560,7 @@ scene.add( mesh )
 		var jsonLoader = new THREE.JSONLoader();
 		jsonLoader.load( "../models/Farmhouse.js", function (geometry2) {
 		var box = new THREE.Mesh(geometry2, particleMaterial);
+		//box.scale.set(50,50,50);
 		box.scale.set(.5,.5,.5);
 		mesh.add(box);
 		}
