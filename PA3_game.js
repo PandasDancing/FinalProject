@@ -1,5 +1,4 @@
 
-
 /*
 Game 0: Group 29
 This is a ThreeJS program which implements a simple game
@@ -128,10 +127,9 @@ The user moves a monkey around the board trying to knock balls into a cone
 			dragcontrols.update();
 
 			//create the ground and the skybox
-			var ground = createGround('grass.png');
-			//var ground = createGround();
+			var ground = createGround();
 			//ground.translateZ(5000);
-			scene.add(ground);
+			 scene.add(ground);
 
 			var skybox = createSkyBox();
 			//var skybox = createSkyBox3();
@@ -146,8 +144,8 @@ The user moves a monkey around the board trying to knock balls into a cone
 			avatar = createAvatar();
 			//avatar.translateY(-5000);
 			//avatar.position.set(200,100,100);
-			avatarCam.translateY(0);
-			avatarCam.translateZ(10);
+			avatarCam.translateY(2);
+			avatarCam.translateZ(5);
 
 			//avatarCam.lookAt(avatar.position);
 			//bug: change back to avatar cam
@@ -506,6 +504,7 @@ The user moves a monkey around the board trying to knock balls into a cone
 					// var scoop = createBoxMesh2(0xff0000,5,1,0.1);
 					// scoop.position.set(0,-1,2);
 					// mesh.add(scoop);
+		      mesh.position.set(40,10,40);
 					return mesh;
 	}
 
@@ -762,7 +761,7 @@ The user moves a monkey around the board trying to knock balls into a cone
 
     if (controls.reset){
       avatar.__dirtyPosition = true;
-      avatar.position.set(40,0,40);
+      avatar.position.set(40,10,40);
     }
 
 	}
