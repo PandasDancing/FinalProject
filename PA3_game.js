@@ -17,6 +17,10 @@ The user moves a monkey around the board trying to knock balls into a cone
 
 	//var cone;
 	var box;
+	var sheep;
+	var numSheeps;
+	var sheepArr = [];  ///*******
+
 
 	var endScene, endCamera, endText;
 	var lostScene, lostText;
@@ -152,8 +156,8 @@ The user moves a monkey around the board trying to knock balls into a cone
 			addSheeps();
 
 			//cone = createConeMesh(4,6);
-			box = createBoxMesh(2,2);
-			box.position.set(30,0,15);
+			box = createBoxMesh(10,8);
+			box.position.set(60,0,20);
 			//box.rotateX(Math.PI/2);
 			scene.add(box);
 
@@ -179,9 +183,12 @@ The user moves a monkey around the board trying to knock balls into a cone
 		  scene.add(npc);
 
 			cube = createEnemy();
-			cube.position.set(-20,5,-20);
+			//cube.position.set(20,0,-20);
+			cube.position.set(randN(20)+10,0.5,randN(20)+10);
 			cube.addEventListener('collision',function(other_object){
-			      if (other_object==sheep){
+				//for (var i = 0; i<sheepArr.length; i++){  ///*******
+					  // var position + new THREE.Vector3( 0, 1, 0 );
+			      if (other_object==avatar){
 									//updates the health if avatar obj is touch by the NPC obj
 									gameState.health --;
 									soundEffect('foxbark.wav');
@@ -189,8 +196,11 @@ The user moves a monkey around the board trying to knock balls into a cone
 									 	gameState.scene='youlose';
 									 }
 								 }
+
 							 })
+
 			scene.add(cube);
+
 			playGameMusic();
 
 	}
@@ -200,15 +210,16 @@ The user moves a monkey around the board trying to knock balls into a cone
 		return Math.random()*n;
 	}
 	function addSheeps(){
-		var numSheeps = 12;
+		numSheeps = 12;
 
 
 		for(i=0;i<numSheeps;i++){
-			var sheep = createSheeps();
-			sheep.position.set(randN(20)+10,0.5,randN(20)+10);
-			scene.add(sheep);
+			sheepArr = createSheeps();
+			sheepArr.position.set(randN(20)+10,0.5,randN(20)+10);
+			//sheepArr.push(sheep); ///*******
+			scene.add(sheepArr);
 
-			sheep.addEventListener( 'collision',
+			sheepArr.addEventListener( 'collision',
 				function( other_object, relative_velocity, relative_rotation, contact_normal ) {
 					if (other_object==cube){
 						console.log("sheep "+i+" hit the box");
@@ -226,7 +237,9 @@ The user moves a monkey around the board trying to knock balls into a cone
 					}
 				}
 			)
-						sheep.addEventListener( 'collision',
+
+			//Sheeps hitting the house
+					sheepArr.addEventListener( 'collision',
 				function( other_object, relative_velocity, relative_rotation, contact_normal ) {
 					if (other_object==box){
 						console.log("sheep "+i+" hit the box");
@@ -497,14 +510,14 @@ The user moves a monkey around the board trying to knock balls into a cone
 	}
 
 	function createEnemy(){
-					var geometry = new THREE.BoxGeometry( 3, 3, 6);
+					var geometry = new THREE.BoxGeometry( 6, 6, 8,);
 					var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
 					var pmaterial = new Physijs.createMaterial(material,0.9,0.05);
 					pmaterial.visible = false;
 					var mesh = new Physijs.BoxMesh( geometry, pmaterial );
 					mesh.setDamping(0.1,0.1);
 					mesh.castShadow = true;
-
+					//mesh.position.set(0,2,0);
 					// avatarCam.position.set(0,8,0);
 					// avatarCam.lookAt(0,7,10);
 					// mesh.add(avatarCam);
@@ -544,12 +557,14 @@ The user moves a monkey around the board trying to knock balls into a cone
 	// 	return mesh;
 	// }
 
+//House
 	function createBoxMesh(r,h){
-		var geometry = new THREE.BoxGeometry( r, h, 10);
+		var geometry = new THREE.BoxGeometry( r, h, 26);
 		var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
 		var pmaterial = new Physijs.createMaterial(material,0.9,0.05);
 		pmaterial.visible = false;
-		var mesh = new Physijs.BoxMesh( geometry, pmaterial, 0 );
+
+		var mesh = new Physijs.BoxMesh( geometry, pmaterial, 0);
 		mesh.setDamping(0.1,0.1);
 		mesh.castShadow = true;
 
@@ -596,20 +611,21 @@ The user moves a monkey around the board trying to knock balls into a cone
 
 	function createSheeps(){
 
-	var geometry = new THREE.BoxGeometry( 2, 2, 6);
+	var geometry = new THREE.BoxGeometry( 1, 1, 6);
 	var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
-	var pmaterial = new Physijs.createMaterial(material,0.9,0.05);
+	var pmaterial = new Physijs.createMaterial(material,0.9,0.01);
 	pmaterial.visible = false;
 	var mesh = new Physijs.BoxMesh( geometry, pmaterial );
 	mesh.setDamping(0.1,0.1);
 	mesh.castShadow = true;
+
 
 	var particleMaterial = new THREE.MeshBasicMaterial();
 	particleMaterial.map = THREE.ImageUtils.loadTexture('../models/SHEEPnew.jpg');
 	particleMaterial.side = THREE.DoubleSide;
 	var jsonLoader = new THREE.JSONLoader();
 	jsonLoader.load( "models/sheepNew.js", function (geometry2) {
-		var sheep = new THREE.Mesh(geometry2, particleMaterial);
+		sheep = new THREE.Mesh(geometry2, particleMaterial);
 		sheep.scale.set(3,3,3);
 		mesh.add(sheep);
 	}
@@ -781,6 +797,10 @@ The user moves a monkey around the board trying to knock balls into a cone
 				if (npc.position.distanceTo(avatar.position) < 20){
 					updateNPC();
 				}
+				///check the distance to a one sheep
+				// if (cube.position.distanceTo(avatar.position) < 20){
+				// 	updateCube();
+				// }
 				break;
 
 			case "start":
