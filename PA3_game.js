@@ -815,7 +815,7 @@ The user moves a monkey around the board trying to knock balls into a cone
 		//draw heads up display ..
 	   var info = document.getElementById("info");
 info.innerHTML='<div style="font-size:24pt">Score: '+ gameState.score
-    + " health="+gameState.health
+    + "; health:"+gameState.health
     + '</div>';
 
 	}
