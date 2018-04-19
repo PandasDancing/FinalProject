@@ -144,8 +144,8 @@ The user moves a monkey around the board trying to knock balls into a cone
 			addSheeps();
 
 			//cone = createConeMesh(4,6);
-			box = createBoxMesh(2,2);
-			box.position.set(30,0,15);
+			box = createBoxMesh(10,8);
+			box.position.set(20,0,20);
 			//box.rotateX(Math.PI/2);
 			scene.add(box);
 
@@ -171,7 +171,7 @@ The user moves a monkey around the board trying to knock balls into a cone
 		  scene.add(npc);
 
 			cube = createEnemy();
-			cube.position.set(-20,5,-20);
+			cube.position.set(20,0,-20);
 			cube.addEventListener('collision',function(other_object){
 			      if (other_object==sheep){
 									//updates the health if avatar obj is touch by the NPC obj
@@ -493,14 +493,14 @@ scene.add( mesh )
 	}
 
 	function createEnemy(){
-					var geometry = new THREE.BoxGeometry( 3, 3, 6);
+					var geometry = new THREE.BoxGeometry( 6, 6, 8,);
 					var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
 					var pmaterial = new Physijs.createMaterial(material,0.9,0.05);
 					pmaterial.visible = false;
 					var mesh = new Physijs.BoxMesh( geometry, pmaterial );
 					mesh.setDamping(0.1,0.1);
 					mesh.castShadow = true;
-
+					//mesh.position.set(0,2,0);
 					// avatarCam.position.set(0,8,0);
 					// avatarCam.lookAt(0,7,10);
 					// mesh.add(avatarCam);
@@ -539,12 +539,14 @@ scene.add( mesh )
 	// 	return mesh;
 	// }
 
+//House
 	function createBoxMesh(r,h){
-		var geometry = new THREE.BoxGeometry( r, h, 10);
+		var geometry = new THREE.BoxGeometry( r, h, 26);
 		var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
 		var pmaterial = new Physijs.createMaterial(material,0.9,0.05);
 		pmaterial.visible = false;
-		var mesh = new Physijs.BoxMesh( geometry, pmaterial, 0 );
+
+		var mesh = new Physijs.BoxMesh( geometry, pmaterial, 0);
 		mesh.setDamping(0.1,0.1);
 		mesh.castShadow = true;
 
@@ -592,7 +594,7 @@ scene.add( mesh )
 
 	var geometry = new THREE.BoxGeometry( 1, 1, 6);
 	var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
-	var pmaterial = new Physijs.createMaterial(material,0.9,0.05);
+	var pmaterial = new Physijs.createMaterial(material,0.9,0.01);
 	pmaterial.visible = false;
 	var mesh = new Physijs.BoxMesh( geometry, pmaterial );
 	mesh.setDamping(0.1,0.1);
