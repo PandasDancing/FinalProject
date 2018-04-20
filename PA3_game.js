@@ -391,6 +391,10 @@ The user moves a monkey around the board trying to knock balls into a cone
 			mesh.add(s);
 		}
 		);
+		trunk=createInvisibleBox(5,5,5);
+		trunk.translateX(24);
+		trunk.translateZ(-25);
+		scene.add(trunk);
 
 		//mountains
 		var particleMaterial3 = new THREE.MeshBasicMaterial();
@@ -414,6 +418,20 @@ The user moves a monkey around the board trying to knock balls into a cone
 			mesh.add(s2);
 		}
 		);
+		//treeside big long box
+		mt=createInvisibleBox(45,40,70);
+		mt.translateX(-25);
+		mt.translateZ(-15);
+		mt.rotateY(-0.2);
+		scene.add(mt);
+		//houseside big long box
+		mt2=createInvisibleBox(45,40,70);
+		mt2.translateX(-25);
+		mt2.translateZ(40);
+		mt2.rotateY(-0.2);
+		scene.add(mt2);
+
+
 
 		return mesh;
 		// we need to rotate the mesh 90 degrees to make it horizontal not vertical
@@ -472,6 +490,18 @@ The user moves a monkey around the board trying to knock balls into a cone
 		var material = new THREE.MeshLambertMaterial( { color: color} );
 		mesh = new Physijs.BoxMesh( geometry, material );
 		//mesh = new Physijs.BoxMesh( geometry, material,0 );
+		mesh.castShadow = true;
+		return mesh;
+	}
+
+	//to stuff the tree trunk and mountains
+	function createInvisibleBox(w,h,d){
+		var geometry = new THREE.BoxGeometry( w, h, d);
+		var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
+		var pmaterial = new Physijs.createMaterial(material,0,0);
+		pmaterial.visible = false;
+		var mesh = new Physijs.BoxMesh( geometry, pmaterial, 0);
+		mesh.setDamping(0.1,0);
 		mesh.castShadow = true;
 		return mesh;
 	}
