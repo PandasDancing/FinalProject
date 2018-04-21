@@ -2,7 +2,8 @@
 /*
 Game 0: Group 29
 This is a ThreeJS program which implements a simple game
-The user moves a monkey around the board trying to knock balls into a cone
+The user moves a dog (protector) around the board trying to knock sheeps into the safety house
+User also can use key "4" to drag the scene to see the setting of our game (skybox)
 */
 
 
@@ -368,8 +369,6 @@ The user moves a monkey around the board trying to knock balls into a cone
 		jsonLoader.load( "models/treetop.js", function (geometry2) {
 			var s = new THREE.Mesh(geometry2, particleMaterial);
 			s.rotateX(Math.PI/2*3);
-			// s.scale.set( 50, 50, 50 );
-			// s.position.set(-1800,-700,-3200);
 			s.scale.set( 0.4, 0.4, 0.4 );
 			s.position.set(25,-25,-15);
 			mesh.add(s);
@@ -384,8 +383,6 @@ The user moves a monkey around the board trying to knock balls into a cone
 		jsonLoader.load( "models/treebody.js", function (geometry2) {
 			var s = new THREE.Mesh(geometry2, particleMaterial2);
 			s.rotateX(Math.PI/2*3);
-			// s.scale.set( 20, 20, 20 );
-			// s.position.set(-2000,-85,0);
 			s.scale.set( 0.1, 0.1, 0.1 );
 			s.position.set(25,-25,0);
 			mesh.add(s);
@@ -404,11 +401,6 @@ The user moves a monkey around the board trying to knock balls into a cone
 			var s = new THREE.Mesh(geometry2, particleMaterial3);
 			var s2 = new THREE.Mesh(geometry2, particleMaterial3);
 			s.rotateX(Math.PI/2*3);
-			// s.scale.set(100, 100, 100 );
-			// s.position.set(500,0,0);
-			// s2.rotateX(Math.PI/2*3);
-			// s2.scale.set( 100, 100, 100 );
-			// s2.position.set(500,60,0);
 			s.scale.set( 2, 2, 2 );
 			s.position.set(30,30,0);
 			s2.rotateX(Math.PI/2*3);
@@ -462,11 +454,6 @@ The user moves a monkey around the board trying to knock balls into a cone
 		var mesh = new THREE.Mesh(geometry, texture);
 
 		return mesh;
-
-		//return skybox;
-
-		//mesh.receiveShadow = false;
-		//return mesh;
 	}
 
 	function createSkyBox2(image,k){
@@ -530,7 +517,6 @@ The user moves a monkey around the board trying to knock balls into a cone
 						mesh.add(dog);
 					}
 				  );
-					//
 					// var scoop = createBoxMesh2(0xff0000,5,1,0.1);
 					// scoop.position.set(0,-1,2);
 					// mesh.add(scoop);
@@ -586,8 +572,8 @@ The user moves a monkey around the board trying to knock balls into a cone
 	// 	return mesh;
 	// }
 
-//House
-	function createBoxMesh(r,h){
+		//safety house
+		function createBoxMesh(r,h){
 		var geometry = new THREE.BoxGeometry( r, h, 26);
 		var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
 		var pmaterial = new Physijs.createMaterial(material,0.9,0.05);
@@ -612,31 +598,6 @@ The user moves a monkey around the board trying to knock balls into a cone
 
 		return mesh;
 	}
-
-
-
-	// function createBall(){
-	// 	//var geometry = new THREE.SphereGeometry( 4, 20, 20);
-	// 	var geometry = new THREE.SphereGeometry( 1, 16, 16);
-	//
-	// 	var friction = 0.8; // high friction
-	// 	var restitution = 0.3; // low restitution
-	//
-	// 	var material = Physijs.createMaterial(
-  //   	new THREE.MeshBasicMaterial({ color: 0xffff00 }),
-  //   	friction,
-  //   	restitution
-	// 	);
-	//
-	// 	//var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
-	// 	var pmaterial = new Physijs.createMaterial(material,0.9,0.5);
-  //   var mesh = new Physijs.BoxMesh( geometry, material );
-	// 	mesh.setDamping(0.1,0.1);
-	// 	mesh.castShadow = true;
-	// 	return mesh;
-	// }
-
-
 
 	function createSheeps(){
 
@@ -679,7 +640,7 @@ The user moves a monkey around the board trying to knock balls into a cone
 
 	function keydown(event){
 		console.log("Keydown:"+event.key);
-		//console.dir(event);
+		// console.dir(event);
 		// first we handle the "play again" key in the "youwon" scene
 		if ((gameState.scene == 'youwon'||gameState.scene == 'lose')&& event.key=='r') {
 				gameState.scene = 'start';
