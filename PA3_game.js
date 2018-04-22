@@ -143,7 +143,7 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 			// create the avatar
 			avatarCam = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 1000 );
 			avatar = createAvatar();
-			//avatar.translateY(-5000);
+			avatar.rotateY(3);
 			//avatar.position.set(200,100,100);
 			avatarCam.translateY(2);
 			avatarCam.translateZ(5);
@@ -169,9 +169,9 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
       if (other_object==avatar){
 						//updates the health if avatar obj is touch by the NPC obj
 						gameState.health --;
-
 						 if (gameState.health==0) {
-						 	gameState.scene='youlose';
+							console.log("way to lose 2222");
+						 	gameState.scene='youlose'; //2nd way to lose: npc touches avatar too many times
 						 }
 						//Teleport the NPC obj to a random position
 						npc.__dirtyPosition = true;
@@ -192,7 +192,8 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 									gameState.health --;
 									soundEffect('foxbark.wav');
 									 if (gameState.health==0) {
-									 	gameState.scene='youlose';
+										console.log("Way to lose 3333"); // when fox hits avatar too many times
+									 	gameState.scene='youlose'; //3rd way to lose
 									 }
 								 }
 
@@ -208,24 +209,26 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 	function randN(n){
 		return Math.random()*n;
 	}
+
+
 	function addSheeps(){
 		numSheeps = 12;
-
-
 		for(i=0;i<numSheeps;i++){
 			sheepArr = createSheeps();
-			sheepArr.position.set(randN(20)+10,0.5,randN(20)+10);
+			sheepArr.position.set(randN(90),0.5,randN(-50));
 			//sheepArr.push(sheep); ///*******
 			scene.add(sheepArr);
 
 			sheepArr.addEventListener( 'collision',
 				function( other_object, relative_velocity, relative_rotation, contact_normal ) {
-					if (other_object==cube){
+					if (other_object==cube){ //when fox hits sheep
 						console.log("sheep "+i+" hit the box");
+						console.log("FOXSHEEP 222");
 						soundEffect('sheep-bleat.wav');
-						gameState.score += 1;  // add one to the score
-						if (gameState.score==10) {
-							gameState.scene='youwon';
+						gameState.score -= 1;  // when fox eats sheep minus one to the score
+						if (gameState.score==-5) {
+							console.log("Way to lose 11111");
+							gameState.scene='youlose'; //1st way of losing: fox eats too many sheep
 						}
 						scene.remove(this);  //why not disapearing??
 						// make the ball drop below the scene ..
@@ -242,10 +245,11 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 				function( other_object, relative_velocity, relative_rotation, contact_normal ) {
 					if (other_object==box){
 						console.log("sheep "+i+" hit the box");
+						console.log("FOXSHEEP 11111");
 						soundEffect('sheep-bleat.wav');
 						gameState.score += 1;
 						if (gameState.score==10) {
-							gameState.scene='youwon';
+							gameState.scene='youwon'; //only way to win is to push 10 sheeps in
 						}
 						scene.remove(this);
 					}
@@ -475,7 +479,7 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 	function createBoxMesh2(color,w,h,d){
 		var geometry = new THREE.BoxGeometry( w, h, d);
 		var material = new THREE.MeshLambertMaterial( { color: color} );
-		mesh = new Physijs.BoxMesh( geometry, material );
+		mesh = new Physijs.BoxMesh( geometry, material);
 		//mesh = new Physijs.BoxMesh( geometry, material,0 );
 		mesh.castShadow = true;
 		return mesh;
@@ -550,28 +554,6 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 					return mesh;
 	}
 
-	function createBoxMesh2(color,w,h,d){
-		var geometry = new THREE.BoxGeometry( w, h, d);
-		var material = new THREE.MeshLambertMaterial( { color: color} );
-		mesh = new Physijs.BoxMesh( geometry, material );
-		//mesh = new Physijs.BoxMesh( geometry, material,0 );
-		mesh.castShadow = true;
-		return mesh;
-	}
-
-	// function createConeMesh(r,h){
-	// 	var geometry = new THREE.ConeGeometry( r, h, 32);
-	// 	var texture = new THREE.TextureLoader().load( '../images/tile.jpg' );
-	// 	texture.wrapS = THREE.RepeatWrapping;
-	// 	texture.wrapT = THREE.RepeatWrapping;
-	// 	texture.repeat.set( 1, 1 );
-	// 	var material = new THREE.MeshLambertMaterial( { color: 0xffffff,  map: texture ,side:THREE.DoubleSide} );
-	// 	var pmaterial = new Physijs.createMaterial(material,0.9,0.5);
-	// 	var mesh = new Physijs.ConeMesh( geometry, pmaterial, 0 );
-	// 	mesh.castShadow = true;
-	// 	return mesh;
-	// }
-
 		//safety house
 		function createBoxMesh(r,h){
 		var geometry = new THREE.BoxGeometry( r, h, 26);
@@ -601,7 +583,7 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 
 	function createSheeps(){
 
-	var geometry = new THREE.BoxGeometry( 1, 1, 6);
+	var geometry = new THREE.BoxGeometry( 6, 1, 6);
 	var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
 	var pmaterial = new Physijs.createMaterial(material,0.9,0.01);
 	pmaterial.visible = false;
