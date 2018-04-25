@@ -654,12 +654,21 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 			case "r": controls.up = true; break;
 			case "f": controls.down = true; break;
 			case "m": controls.speed = 30; break;
-      			case " ": controls.fly = true; break;
-      			case "h": controls.reset = true; break;
-						case "x": avatar.rotation.set(0,0,0);
-						avatar.__dirtyRotation = true;
-						console.dir(avatar.rotation);
-						break;
+      case " ": controls.fly = true; break;
+      case "h": controls.reset = true; break;
+			case "x": avatar.rotation.set(0,0,0);
+								avatar.__dirtyRotation = true;
+								console.dir(avatar.rotation); break;
+
+			//dog barks, repels fox to save some time to push the sheep
+			case "b": soundEffect('dogBarking.wav');
+								//fox.setLinearVelocity(0); break;
+								//fox.__dirtyPosition = true; break;
+								if (cube.position.distanceTo(avatar.position) < 30){
+									repelFox();
+								}
+								//console.log("Fox Repeled");
+								break;
 
 
 			// switch cameras
@@ -700,12 +709,22 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 		npc.setLinearVelocity(npc.getWorldDirection().multiplyScalar(0.8));
 	}
 
+
 	function updateCube(){
 		cube.lookAt(avatar.position);
 		  //npc.__dirtyPosition = true;
-		cube.setLinearVelocity(cube.getWorldDirection().multiplyScalar(3));
+		cube.setLinearVelocity(cube.getWorldDirection().multiplyScalar(2.5));
 	}
 
+	//repels the fox
+	function repelFox(){
+		cube.lookAt(avatar.position);
+		//npc.__dirtyPosition = true;
+		//cube.setLinearVelocity(cube.getWorldDirection().multiplyScalar(0));
+		cube.translateZ(-5);
+		cube.__dirtyPosition = true;
+		//console.log("Fox Speed adjust");
+	}
 
   function updateAvatar(){
 		"change the avatar's linear or angular velocity based on controls state (set by WSAD key presses)"
@@ -772,6 +791,8 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 				if (npc.position.distanceTo(avatar.position) < 20){
 					updateNPC();
 				}
+
+
 				///check the distance to a one sheep
 				// if (cube.position.distanceTo(avatar.position) < 20){
 				// 	updateCube();
