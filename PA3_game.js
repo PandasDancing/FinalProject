@@ -727,9 +727,12 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
     }
 
 		if (controls.left){
-			avatar.setAngularVelocity(new THREE.Vector3(0,controls.speed*0.1,0));
+			avatar.rotateY(0.02);
+			avatar.__dirtyRotation = true;
 		} else if (controls.right){
-			avatar.setAngularVelocity(new THREE.Vector3(0,-controls.speed*0.1,0));
+			avatar.rotateY(-0.02);
+			avatar.__dirtyRotation = true;
+			//avatar.setAngularVelocity(new THREE.Vector3(0,1,0));
 		}
 
     if (controls.reset){
