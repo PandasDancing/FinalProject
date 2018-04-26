@@ -14,6 +14,7 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 	var avatar;
 	var enemy;
 	var camerax;
+	var cerca;
 	// here are some mesh objects ...
 	var tick = 0, clock = new THREE.Clock(),container
 	//, gui = new dat.GUI( { width: 350 } ),
@@ -138,7 +139,7 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 			dragcamera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 
 			dragcontrols = new THREE.OrbitControls( dragcamera, renderer.domElement  );
-			dragcamera.position.set( 0, 320, 100 );
+			dragcamera.position.set( 0, 520, 100 );
 			dragcontrols.update();
 
 			//create the ground and the skybox
@@ -158,7 +159,7 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 			avatar = createAvatar();
 
 			avatar.rotateY(3);
-			avatar.position.set(1,2,10);
+			avatar.position.set(20,2,15);
 			avatarCam.translateY(2);
 			avatarCam.translateZ(5);
 
@@ -174,12 +175,35 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 			//box.rotateX(Math.PI/2);
 			scene.add(box);
 
+			var cerca1 = createCerca();
+			cerca1.position.set(75,0,22);
+			scene.add(cerca1);
+
+			var cerca2 = createCerca();
+			cerca2.position.set(75,0,27);
+			scene.add(cerca2);
+
+			var cerca3 = createCerca();
+			cerca3.position.set(75,0,32);
+			scene.add(cerca3);
+
+			var cerca4 = createCerca();
+			cerca4.position.set(74,0,33);
+			cerca4.rotateY(Math.PI/2);
+			scene.add(cerca4);
+
+			var cerca5 = createCerca();
+			cerca5.position.set(69,0,33);
+			cerca5.rotateY(Math.PI/2);
+			scene.add(cerca5);
+
+
 			addRabbits();
 
 
 			cube = createEnemy();
 			//cube.position.set(20,0,-20);
-			cube.position.set(randN(20)+10,0.5,randN(20)+10);
+			cube.position.set(randN(30)+10,0.5,randN(20)+10);
 			cube.addEventListener('collision',function(other_object){
 
 			      if (other_object==avatar){
@@ -251,6 +275,7 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 			sheepArr = createSheep();
 			sheepArr.position.set(randN(80),1,randN(-60));
 			scene.add(sheepArr);
+			console.log(sheepArr.length);
 
 			sheepArr.addEventListener( 'collision',
 				function( other_object, relative_velocity, relative_rotation, contact_normal ) {
@@ -570,7 +595,32 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 					// var scoop = createBoxMesh2(0xff0000,5,1,0.1);
 					// scoop.position.set(0,-1,2);
 					// mesh.add(scoop);
-		       mesh.position.set(40,10,40);
+		       //mesh.position.set(20,10,40);
+					return mesh;
+	}
+
+
+	function createCerca(){
+					var geometry = new THREE.BoxGeometry( 2, 2, 1);
+					//geometry.translate( 0, 0, 2);
+					var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
+					var pmaterial = new Physijs.createMaterial(material,0.9,0.01);
+					pmaterial.visible = false;
+					var mesh = new Physijs.BoxMesh( geometry, pmaterial, 0 );
+					mesh.setDamping(0.1,0.1);
+					mesh.castShadow = true;
+
+					var particleMaterial = new THREE.MeshBasicMaterial();
+					particleMaterial.map = THREE.ImageUtils.loadTexture('../models/TreeMat.jpg');
+					particleMaterial.side = THREE.DoubleSide;
+					var jsonLoader = new THREE.JSONLoader();
+					jsonLoader.load( "../models/cerca.js", function (geometry2) {
+					var cerca = new THREE.Mesh(geometry2, particleMaterial);
+					cerca.scale.set(1,1,1);
+					mesh.add(cerca);
+					}
+				  );
+		      //mesh.position.set(-40,5,10);
 					return mesh;
 	}
 
@@ -636,10 +686,10 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 
 	function createSheep(){
 
-	var geometry = new THREE.BoxGeometry( 2, 2, 4);
-	geometry.translate(0,2,0);
+	var geometry = new THREE.BoxGeometry( 4, 3, 4);
+	geometry.translate(0,1,0);
 	var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
-	var pmaterial = new Physijs.createMaterial(material,0.95,0.05);
+	var pmaterial = new Physijs.createMaterial(material,.8,0.05);
 	pmaterial.visible = false;
 	var mesh = new Physijs.BoxMesh( geometry, pmaterial );
 	mesh.setDamping(0.1,0.1);
@@ -789,11 +839,11 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
       case "h": controls.reset = false; break;
 		}
 	}
-	// function updateNPC(){
-	// 	npc.lookAt(avatar.position);
-	// 	  //npc.__dirtyPosition = true;
-	// 	npc.setLinearVelocity(npc.getWorldDirection().multiplyScalar(0.8));
-	// }
+	function updateNPC(){
+		npc.lookAt(avatar.position);
+		  //npc.__dirtyPosition = true;
+		npc.setLinearVelocity(npc.getWorldDirection().multiplyScalar(0.8));
+	}
 	// function updateSheep(){
 	// 	//	sheep.lookAt(avatar.position);
 	// 	sheep.setLinearVelocity(10,0,0);
@@ -801,9 +851,9 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 
 
 	function updateCube(){
-		cube.lookAt(sheepArr.position);
+		cube.lookAt(avatar.position);
 		  //npc.__dirtyPosition = true;
-		cube.setLinearVelocity(cube.getWorldDirection().multiplyScalar(2.5));
+		cube.setLinearVelocity(cube.getWorldDirection().multiplyScalar(2.0));
 	}
 
 	//repels the fox
@@ -881,9 +931,9 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 					camera3.lookAt(avatar.position);
 				}
 
-				// if (npc.position.distanceTo(avatar.position) < 20){
-				// 	updateNPC();
-				// }
+				if (npc.position.distanceTo(avatar.position) < 20){
+					updateNPC();
+				}
 
 
 
