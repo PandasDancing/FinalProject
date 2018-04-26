@@ -176,26 +176,6 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 
 			addRabbits();
 
-			// npc = createNPC();
-			// npc.position.set(20,1,10);
-			// scene.add(npc);
-			npc = createBoxMesh2(0x0000ff,2,2,2);
-			npc.position.set(20,5,-20);
-      npc.addEventListener('collision',function(other_object){
-      if (other_object==avatar){
-						//updates the health if avatar obj is touch by the NPC obj
-						gameState.health --;
-						 if (gameState.health == 0) {
-							console.log("way to lose 2222");
-						 	gameState.scene='youlose'; //2nd way to lose: npc touches avatar too many times
-						 }
-						//Teleport the NPC obj to a random position
-						npc.__dirtyPosition = true;
-						npc.position.set(randN(50)-25,30,randN(50)-25);//Random
-
-						        }
-						      })
-		  scene.add(npc);
 
 			cube = createEnemy();
 			//cube.position.set(20,0,-20);
