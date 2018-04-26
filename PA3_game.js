@@ -138,7 +138,7 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 			dragcamera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 
 			dragcontrols = new THREE.OrbitControls( dragcamera, renderer.domElement  );
-			dragcamera.position.set( 0, 520, 100 );
+			dragcamera.position.set( 0, 320, 100 );
 			dragcontrols.update();
 
 			//create the ground and the skybox
@@ -789,11 +789,11 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
       case "h": controls.reset = false; break;
 		}
 	}
-	function updateNPC(){
-		npc.lookAt(avatar.position);
-		  //npc.__dirtyPosition = true;
-		npc.setLinearVelocity(npc.getWorldDirection().multiplyScalar(0.8));
-	}
+	// function updateNPC(){
+	// 	npc.lookAt(avatar.position);
+	// 	  //npc.__dirtyPosition = true;
+	// 	npc.setLinearVelocity(npc.getWorldDirection().multiplyScalar(0.8));
+	// }
 	// function updateSheep(){
 	// 	//	sheep.lookAt(avatar.position);
 	// 	sheep.setLinearVelocity(10,0,0);
@@ -881,9 +881,9 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 					camera3.lookAt(avatar.position);
 				}
 
-				if (npc.position.distanceTo(avatar.position) < 20){
-					updateNPC();
-				}
+				// if (npc.position.distanceTo(avatar.position) < 20){
+				// 	updateNPC();
+				// }
 
 
 
