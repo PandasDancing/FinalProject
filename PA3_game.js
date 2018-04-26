@@ -373,6 +373,12 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 			s.scale.set( 0.4, 0.4, 0.4 );
 			s.position.set(25,-25,-15);
 			mesh.add(s);
+
+			var y = new THREE.Mesh(geometry2, particleMaterial);
+			y.rotateX(Math.PI/2*3);
+			y.scale.set( 0.4, 0.4, 0.4 );
+			y.position.set(105,10,-15);
+			mesh.add(y);
 		}
 		);
 
@@ -387,12 +393,23 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 			s.scale.set( 0.1, 0.1, 0.1 );
 			s.position.set(25,-25,0);
 			mesh.add(s);
+
+			var y = new THREE.Mesh(geometry2, particleMaterial2);
+			y.rotateX(Math.PI/2*3);
+			y.scale.set( 0.1, 0.1, 0.1 );
+			y.position.set(105,10,0);
+			mesh.add(y);
 		}
 		);
 		trunk=createInvisibleBox(5,10,5);
 		trunk.translateX(24);
 		trunk.translateZ(-25);
 		scene.add(trunk);
+
+		trunkTwo = createInvisibleBox(5,10,5);
+		trunkTwo.translateX(105);
+		trunkTwo.translateZ(10);
+		scene.add(trunkTwo);
 
 		//mountains
 		var particleMaterial3 = new THREE.MeshBasicMaterial();
