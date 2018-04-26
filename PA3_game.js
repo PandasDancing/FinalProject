@@ -801,7 +801,7 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 
 
 	function updateCube(){
-		cube.lookAt(avatar.position);
+		cube.lookAt(sheepArr.position);
 		  //npc.__dirtyPosition = true;
 		cube.setLinearVelocity(cube.getWorldDirection().multiplyScalar(2.5));
 	}
