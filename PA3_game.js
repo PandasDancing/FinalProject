@@ -13,7 +13,11 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 	var camera, avatarCam, camera3;  // we have two cameras in the main scene
 	var avatar;
 	var enemy;
+	var camerax;
 	// here are some mesh objects ...
+	var tick = 0, clock = new THREE.Clock(),container
+	//, gui = new dat.GUI( { width: 350 } ),
+	var	options, spawnerOptions, particleSystem, stats, control;
 
 	//var cone;
 	var box;
@@ -118,6 +122,15 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 			camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 1000 );
 			camera.position.set(0,50,0);
 			camera.lookAt(0,0,0);
+			camera.updateProjectionMatrix();
+
+			particleSystem = new THREE.GPUParticleSystem( {
+				maxParticles: 250000
+			} );
+			scene.add( particleSystem );
+			console.log("added particle")
+			initSprown();
+
 
 			camera3 = new THREE.PerspectiveCamera( 120, window.innerWidth / window.innerHeight, 0.1, 1000 );
 			camera3.position.set(20,20,30);
@@ -163,26 +176,6 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 
 			addRabbits();
 
-			// npc = createNPC();
-			// npc.position.set(20,1,10);
-			// scene.add(npc);
-			npc = createBoxMesh2(0x0000ff,2,2,2);
-			npc.position.set(20,5,-20);
-      npc.addEventListener('collision',function(other_object){
-      if (other_object==avatar){
-						//updates the health if avatar obj is touch by the NPC obj
-						gameState.health --;
-						 if (gameState.health == 0) {
-							console.log("way to lose 2222");
-						 	gameState.scene='youlose'; //2nd way to lose: npc touches avatar too many times
-						 }
-						//Teleport the NPC obj to a random position
-						npc.__dirtyPosition = true;
-						npc.position.set(randN(50)-25,30,randN(50)-25);//Random
-
-						        }
-						      })
-		  scene.add(npc);
 
 			cube = createEnemy();
 			//cube.position.set(20,0,-20);
@@ -207,6 +200,45 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 
 	}
 
+  function initSprown() {
+		console.log("init sprown")
+		options = {
+				position: new THREE.Vector3(),
+				positionRandomness: .3,
+				velocity: new THREE.Vector3(),
+				velocityRandomness: .5,
+				color: 0xaa88ff,
+				colorRandomness: .2,
+				turbulence: .5,
+				lifetime: 2,
+				size: 5,
+				sizeRandomness: 1
+			};
+			spawnerOptions = {
+				spawnRate: 15000,
+				horizontalSpeed: 1.5,
+				verticalSpeed: 1.33,
+				timeScale: 1
+			};
+
+			stats = new Stats();
+			control = new THREE.TrackballControls( camera, renderer.domElement );
+			control.rotateSpeed = 5.0;
+			control.zoomSpeed = 2.2;
+			control.panSpeed = 1;
+			control.dynamicDampingFactor = 0.3;
+
+			window.addEventListener( 'resize', onWindowResize, false );
+	}
+
+	function onWindowResize() {
+
+		camera.aspect = window.innerWidth / window.innerHeight;
+		camera.updateProjectionMatrix();
+
+		renderer.setSize( window.innerWidth, window.innerHeight );
+
+	}
 
 	function randN(n){
 		return Math.random()*n;
@@ -320,6 +352,7 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 		document.body.appendChild( renderer.domElement );
 		renderer.shadowMap.enabled = true;
 		renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+		renderer.setPixelRatio( window.devicePixelRatio );
 	}
 
 
@@ -373,6 +406,12 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 			s.scale.set( 0.4, 0.4, 0.4 );
 			s.position.set(25,-25,-15);
 			mesh.add(s);
+
+			var y = new THREE.Mesh(geometry2, particleMaterial);
+			y.rotateX(Math.PI/2*3);
+			y.scale.set( 0.4, 0.4, 0.4 );
+			y.position.set(105,10,-15);
+			mesh.add(y);
 		}
 		);
 
@@ -387,12 +426,23 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 			s.scale.set( 0.1, 0.1, 0.1 );
 			s.position.set(25,-25,0);
 			mesh.add(s);
+
+			var y = new THREE.Mesh(geometry2, particleMaterial2);
+			y.rotateX(Math.PI/2*3);
+			y.scale.set( 0.1, 0.1, 0.1 );
+			y.position.set(105,10,0);
+			mesh.add(y);
 		}
 		);
 		trunk=createInvisibleBox(5,10,5);
 		trunk.translateX(24);
 		trunk.translateZ(-25);
 		scene.add(trunk);
+
+		trunkTwo = createInvisibleBox(5,10,5);
+		trunkTwo.translateX(105);
+		trunkTwo.translateZ(10);
+		scene.add(trunkTwo);
 
 		//mountains
 		var particleMaterial3 = new THREE.MeshBasicMaterial();
@@ -807,6 +857,7 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 
 		requestAnimationFrame( animate );
 		dragcontrols.update();
+		renderer.render( scene, camera );
 
 		switch(gameState.scene) {
 			case "youwon":
@@ -840,6 +891,23 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 				// if (cube.position.distanceTo(avatar.position) < 20){
 				// 	updateCube();
 				// }
+				control.update();
+				var delta = clock.getDelta() * spawnerOptions.timeScale;
+					tick += delta;
+					if ( tick < 0 ) tick = 0;
+					if ( delta > 0 ) {
+						options.position.x = Math.sin( tick * spawnerOptions.horizontalSpeed ) * 20;
+						options.position.y = Math.sin( tick * spawnerOptions.verticalSpeed ) * 10;
+						options.position.z = Math.sin( tick * spawnerOptions.horizontalSpeed + spawnerOptions.verticalSpeed ) * 5;
+						for ( var x = 0; x < spawnerOptions.spawnRate * delta; x++ ) {
+							// Yep, that's really it.	Spawning particles is super cheap, and once you spawn them, the rest of
+							// their lifecycle is handled entirely on the GPU, driven by a time uniform updated below
+							particleSystem.spawnParticle( options );
+						}
+					}
+					particleSystem.update( tick );
+
+					stats.update();
 				break;
 
 			case "start":
