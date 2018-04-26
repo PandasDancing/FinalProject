@@ -2,7 +2,8 @@
 /*
 Game 0: Group 29
 This is a ThreeJS program which implements a simple game
-The user moves a monkey around the board trying to knock balls into a cone
+The user moves a dog (protector) around the board trying to knock sheeps into the safety house
+User also can use key "4" to drag the scene to see the setting of our game (skybox)
 */
 
 
@@ -20,8 +21,9 @@ The user moves a monkey around the board trying to knock balls into a cone
 
 	//var cone;
 	var box;
-	var sheep;
-	var numSheeps;
+
+	var rabbit;
+	var numSheep;
 	var sheepArr = [];  ///*******
 
 
@@ -47,7 +49,7 @@ The user moves a monkey around the board trying to knock balls into a cone
 	// Here is the main game control
   init(); //
 	initControls();
-	console.log("PA03!");
+	console.log("Final Project!");
 	animate();  // start the animation loop!
 
 
@@ -145,18 +147,18 @@ The user moves a monkey around the board trying to knock balls into a cone
 			 scene.add(ground);
 
 			var skybox = createSkyBox();
-			//var skybox = createSkyBox3();
 			skybox.translateY(500);
 			scene.add(skybox);
 
 			var ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.8);// better light
 			scene.add(ambientLight);
-			//createSkyBox3();
+
 			// create the avatar
 			avatarCam = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 1000 );
 			avatar = createAvatar();
-			//avatar.translateY(-5000);
-			//avatar.position.set(200,100,100);
+
+			avatar.rotateY(3);
+			avatar.position.set(1,2,10);
 			avatarCam.translateY(2);
 			avatarCam.translateZ(5);
 
@@ -164,13 +166,15 @@ The user moves a monkey around the board trying to knock balls into a cone
 			//bug: change back to avatar cam
 			scene.add(avatar);
 			gameState.camera = avatarCam;
-			addSheeps();
+			addSheep();
 
 			//cone = createConeMesh(4,6);
 			box = createBoxMesh(10,8);
 			box.position.set(60,0,20);
 			//box.rotateX(Math.PI/2);
 			scene.add(box);
+
+			addRabbits();
 
 			// npc = createNPC();
 			// npc.position.set(20,1,10);
@@ -181,9 +185,9 @@ The user moves a monkey around the board trying to knock balls into a cone
       if (other_object==avatar){
 						//updates the health if avatar obj is touch by the NPC obj
 						gameState.health --;
-
-						 if (gameState.health==0) {
-						 	gameState.scene='youlose';
+						 if (gameState.health == 0) {
+							console.log("way to lose 2222");
+						 	gameState.scene='youlose'; //2nd way to lose: npc touches avatar too many times
 						 }
 						//Teleport the NPC obj to a random position
 						npc.__dirtyPosition = true;
@@ -197,14 +201,14 @@ The user moves a monkey around the board trying to knock balls into a cone
 			//cube.position.set(20,0,-20);
 			cube.position.set(randN(20)+10,0.5,randN(20)+10);
 			cube.addEventListener('collision',function(other_object){
-				//for (var i = 0; i<sheepArr.length; i++){  ///*******
-					  // var position + new THREE.Vector3( 0, 1, 0 );
+
 			      if (other_object==avatar){
 									//updates the health if avatar obj is touch by the NPC obj
 									gameState.health --;
 									soundEffect('foxbark.wav');
 									 if (gameState.health==0) {
-									 	gameState.scene='youlose';
+										console.log("Way to lose 3333"); // when fox hits avatar too many times
+									 	gameState.scene='youlose'; //3rd way to lose
 									 }
 								 }
 
@@ -259,26 +263,27 @@ The user moves a monkey around the board trying to knock balls into a cone
 	function randN(n){
 		return Math.random()*n;
 	}
-	function addSheeps(){
-		numSheeps = 12;
 
-
-		for(i=0;i<numSheeps;i++){
-			sheepArr = createSheeps();
-			sheepArr.position.set(randN(20)+10,0.5,randN(20)+10);
-			//sheepArr.push(sheep); ///*******
+//the Cube in this function is the FOX
+	function addSheep(){
+		numSheep = 15;
+		for(i=0;i<numSheep;i++){
+			sheepArr = createSheep();
+			sheepArr.position.set(randN(80),1,randN(-60));
 			scene.add(sheepArr);
 
 			sheepArr.addEventListener( 'collision',
 				function( other_object, relative_velocity, relative_rotation, contact_normal ) {
-					if (other_object==cube){
+					if (other_object==cube){ //when fox hits sheep
 						console.log("sheep "+i+" hit the box");
+						console.log("FOXSHEEP 222");
 						soundEffect('sheep-bleat.wav');
-						gameState.score += 1;  // add one to the score
-						if (gameState.score==10) {
-							gameState.scene='youwon';
+						gameState.score -= 1;  // when fox eats sheep minus one to the score
+						if (gameState.score == -5) {
+							console.log("Way to lose 11111");
+							gameState.scene='youlose'; //1st way of losing: fox eats too many sheep
 						}
-						scene.remove(this);  //why not disapearing??
+						scene.remove(this);
 						// make the ball drop below the scene ..
 						// threejs doesn't let us remove it from the schene...
 
@@ -289,14 +294,15 @@ The user moves a monkey around the board trying to knock balls into a cone
 			)
 
 			//Sheeps hitting the house
-					sheepArr.addEventListener( 'collision',
+				sheepArr.addEventListener( 'collision',
 				function( other_object, relative_velocity, relative_rotation, contact_normal ) {
 					if (other_object==box){
 						console.log("sheep "+i+" hit the box");
+						console.log("FOXSHEEP 11111");
 						soundEffect('sheep-bleat.wav');
 						gameState.score += 1;
 						if (gameState.score==10) {
-							gameState.scene='youwon';
+							gameState.scene='youwon'; //only way to win is to push 10 sheeps in
 						}
 						scene.remove(this);
 					}
@@ -382,8 +388,6 @@ The user moves a monkey around the board trying to knock balls into a cone
 		return light;
 	}
 
-
-
 	function createBoxMesh(color){
 		var geometry = new THREE.BoxGeometry( 1, 1, 1);
 		var material = new THREE.MeshLambertMaterial( { color: color} );
@@ -392,8 +396,6 @@ The user moves a monkey around the board trying to knock balls into a cone
 		mesh.castShadow = true;
 		return mesh;
 	}
-
-
 
 	function createGround(){
 		// creating a textured plane which receives shadows
@@ -421,11 +423,15 @@ The user moves a monkey around the board trying to knock balls into a cone
 		jsonLoader.load( "models/treetop.js", function (geometry2) {
 			var s = new THREE.Mesh(geometry2, particleMaterial);
 			s.rotateX(Math.PI/2*3);
-			// s.scale.set( 50, 50, 50 );
-			// s.position.set(-1800,-700,-3200);
 			s.scale.set( 0.4, 0.4, 0.4 );
 			s.position.set(25,-25,-15);
 			mesh.add(s);
+
+			var y = new THREE.Mesh(geometry2, particleMaterial);
+			y.rotateX(Math.PI/2*3);
+			y.scale.set( 0.4, 0.4, 0.4 );
+			y.position.set(105,10,-15);
+			mesh.add(y);
 		}
 		);
 
@@ -437,13 +443,26 @@ The user moves a monkey around the board trying to knock balls into a cone
 		jsonLoader.load( "models/treebody.js", function (geometry2) {
 			var s = new THREE.Mesh(geometry2, particleMaterial2);
 			s.rotateX(Math.PI/2*3);
-			// s.scale.set( 20, 20, 20 );
-			// s.position.set(-2000,-85,0);
 			s.scale.set( 0.1, 0.1, 0.1 );
 			s.position.set(25,-25,0);
 			mesh.add(s);
+
+			var y = new THREE.Mesh(geometry2, particleMaterial2);
+			y.rotateX(Math.PI/2*3);
+			y.scale.set( 0.1, 0.1, 0.1 );
+			y.position.set(105,10,0);
+			mesh.add(y);
 		}
 		);
+		trunk=createInvisibleBox(5,10,5);
+		trunk.translateX(24);
+		trunk.translateZ(-25);
+		scene.add(trunk);
+
+		trunkTwo = createInvisibleBox(5,10,5);
+		trunkTwo.translateX(105);
+		trunkTwo.translateZ(10);
+		scene.add(trunkTwo);
 
 		//mountains
 		var particleMaterial3 = new THREE.MeshBasicMaterial();
@@ -453,11 +472,6 @@ The user moves a monkey around the board trying to knock balls into a cone
 			var s = new THREE.Mesh(geometry2, particleMaterial3);
 			var s2 = new THREE.Mesh(geometry2, particleMaterial3);
 			s.rotateX(Math.PI/2*3);
-			// s.scale.set(100, 100, 100 );
-			// s.position.set(500,0,0);
-			// s2.rotateX(Math.PI/2*3);
-			// s2.scale.set( 100, 100, 100 );
-			// s2.position.set(500,60,0);
 			s.scale.set( 2, 2, 2 );
 			s.position.set(30,30,0);
 			s2.rotateX(Math.PI/2*3);
@@ -467,11 +481,22 @@ The user moves a monkey around the board trying to knock balls into a cone
 			mesh.add(s2);
 		}
 		);
+		//treeside big long box
+		mt=createInvisibleBox(45,40,70);
+		mt.translateX(-25);
+		mt.translateZ(-15);
+		mt.rotateY(-0.2);
+		scene.add(mt);
+		//houseside big long box
+		mt2=createInvisibleBox(45,40,70);
+		mt2.translateX(-25);
+		mt2.translateZ(40);
+		mt2.rotateY(-0.2);
+		scene.add(mt2);
 
 		return mesh;
 		// we need to rotate the mesh 90 degrees to make it horizontal not vertical
 	}
-
 
 
 	function createSkyBox(){
@@ -497,11 +522,6 @@ The user moves a monkey around the board trying to knock balls into a cone
 		var mesh = new THREE.Mesh(geometry, texture);
 
 		return mesh;
-
-		//return skybox;
-
-		//mesh.receiveShadow = false;
-		//return mesh;
 	}
 
 	function createSkyBox2(image,k){
@@ -523,18 +543,33 @@ The user moves a monkey around the board trying to knock balls into a cone
 	function createBoxMesh2(color,w,h,d){
 		var geometry = new THREE.BoxGeometry( w, h, d);
 		var material = new THREE.MeshLambertMaterial( { color: color} );
-		mesh = new Physijs.BoxMesh( geometry, material );
+		mesh = new Physijs.BoxMesh( geometry, material);
 		//mesh = new Physijs.BoxMesh( geometry, material,0 );
 		mesh.castShadow = true;
 		return mesh;
 	}
 
+	//to stuff the tree trunk and mountains
+	function createInvisibleBox(w,h,d){
+		var geometry = new THREE.BoxGeometry( w, h, d);
+		//geometry.translate();
+		var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
+		var pmaterial = new Physijs.createMaterial(material,0,0);
+		pmaterial.visible = false;
+		var mesh = new Physijs.BoxMesh( geometry, pmaterial, 0);
+		mesh.setDamping(0.1,0);
+		mesh.castShadow = true;
+		return mesh;
+	}
+
 	function createAvatar(){
-					var geometry = new THREE.BoxGeometry( 4, 4, 6);
+					var geometry = new THREE.BoxGeometry( 4, 4, 7);
+					geometry.translate( 0.2, 0, 2);
 					var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
 					var pmaterial = new Physijs.createMaterial(material,0.9,0.01);
 					pmaterial.visible = false;
 					var mesh = new Physijs.BoxMesh( geometry, pmaterial );
+
 					mesh.setDamping(0.1,0.1);
 					mesh.castShadow = true;
 
@@ -548,28 +583,31 @@ The user moves a monkey around the board trying to knock balls into a cone
 					particleMaterial.side = THREE.DoubleSide;
 					var jsonLoader = new THREE.JSONLoader();
 					jsonLoader.load( "models/dog.js", function (geometry2) {
-						var dog = new THREE.Mesh(geometry2, particleMaterial);
-						//dog.scale.set(1000,1000,1000);
-						mesh.add(dog);
+					var dog = new THREE.Mesh(geometry2, particleMaterial);
+					mesh.add(dog);
 					}
 				  );
-					//
 					// var scoop = createBoxMesh2(0xff0000,5,1,0.1);
 					// scoop.position.set(0,-1,2);
 					// mesh.add(scoop);
-		      mesh.position.set(40,10,40);
+		       mesh.position.set(40,10,40);
 					return mesh;
 	}
 
 	function createEnemy(){
-					var geometry = new THREE.BoxGeometry( 6, 6, 8,);
+					var geometry = new THREE.BoxGeometry( 4, 4, 6,);
+					geometry.translate( 0, 0, 4);
 					var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
 					var pmaterial = new Physijs.createMaterial(material,0.9,0.05);
+
 					pmaterial.visible = false;
 					var mesh = new Physijs.BoxMesh( geometry, pmaterial );
-					mesh.setDamping(0.1,0.1);
+					//mesh.setDamping(0.1,0.1);
 					mesh.castShadow = true;
-					//mesh.position.set(0,2,0);
+					//var center = geometry.getCenter();
+					//mesh.__dirtyPosition = ;
+					//center.translateX(10);
+										//mesh.position.set(0,2,0);
 					// avatarCam.position.set(0,8,0);
 					// avatarCam.lookAt(0,7,10);
 					// mesh.add(avatarCam);
@@ -587,35 +625,14 @@ The user moves a monkey around the board trying to knock balls into a cone
 					return mesh;
 	}
 
-	function createBoxMesh2(color,w,h,d){
-		var geometry = new THREE.BoxGeometry( w, h, d);
-		var material = new THREE.MeshLambertMaterial( { color: color} );
-		mesh = new Physijs.BoxMesh( geometry, material );
-		//mesh = new Physijs.BoxMesh( geometry, material,0 );
-		mesh.castShadow = true;
-		return mesh;
-	}
+		//safety house
+		function createBoxMesh(r,h){
 
-	// function createConeMesh(r,h){
-	// 	var geometry = new THREE.ConeGeometry( r, h, 32);
-	// 	var texture = new THREE.TextureLoader().load( '../images/tile.jpg' );
-	// 	texture.wrapS = THREE.RepeatWrapping;
-	// 	texture.wrapT = THREE.RepeatWrapping;
-	// 	texture.repeat.set( 1, 1 );
-	// 	var material = new THREE.MeshLambertMaterial( { color: 0xffffff,  map: texture ,side:THREE.DoubleSide} );
-	// 	var pmaterial = new Physijs.createMaterial(material,0.9,0.5);
-	// 	var mesh = new Physijs.ConeMesh( geometry, pmaterial, 0 );
-	// 	mesh.castShadow = true;
-	// 	return mesh;
-	// }
-
-//House
-	function createBoxMesh(r,h){
 		var geometry = new THREE.BoxGeometry( r, h, 26);
+		geometry.translate(0,0,3);
 		var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
 		var pmaterial = new Physijs.createMaterial(material,0.9,0.05);
 		pmaterial.visible = false;
-
 		var mesh = new Physijs.BoxMesh( geometry, pmaterial, 0);
 		mesh.setDamping(0.1,0.1);
 		mesh.castShadow = true;
@@ -627,6 +644,7 @@ The user moves a monkey around the board trying to knock balls into a cone
 		var jsonLoader = new THREE.JSONLoader();
 		jsonLoader.load( "../models/Farmhouse.js", function (geometry2) {
 		var box = new THREE.Mesh(geometry2, particleMaterial);
+			box.__dirtyPosition = true;
 		//box.scale.set(50,50,50);
 		box.scale.set(.5,.5,.5);
 		mesh.add(box);
@@ -636,36 +654,12 @@ The user moves a monkey around the board trying to knock balls into a cone
 		return mesh;
 	}
 
+	function createSheep(){
 
-
-	// function createBall(){
-	// 	//var geometry = new THREE.SphereGeometry( 4, 20, 20);
-	// 	var geometry = new THREE.SphereGeometry( 1, 16, 16);
-	//
-	// 	var friction = 0.8; // high friction
-	// 	var restitution = 0.3; // low restitution
-	//
-	// 	var material = Physijs.createMaterial(
-  //   	new THREE.MeshBasicMaterial({ color: 0xffff00 }),
-  //   	friction,
-  //   	restitution
-	// 	);
-	//
-	// 	//var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
-	// 	var pmaterial = new Physijs.createMaterial(material,0.9,0.5);
-  //   var mesh = new Physijs.BoxMesh( geometry, material );
-	// 	mesh.setDamping(0.1,0.1);
-	// 	mesh.castShadow = true;
-	// 	return mesh;
-	// }
-
-
-
-	function createSheeps(){
-
-	var geometry = new THREE.BoxGeometry( 1, 1, 6);
+	var geometry = new THREE.BoxGeometry( 2, 2, 4);
+	geometry.translate(0,2,0);
 	var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
-	var pmaterial = new Physijs.createMaterial(material,0.9,0.01);
+	var pmaterial = new Physijs.createMaterial(material,0.95,0.05);
 	pmaterial.visible = false;
 	var mesh = new Physijs.BoxMesh( geometry, pmaterial );
 	mesh.setDamping(0.1,0.1);
@@ -686,6 +680,38 @@ The user moves a monkey around the board trying to knock balls into a cone
 
 }
 
+		function createRabbits(){
+		var geometry = new THREE.BoxGeometry( 2, 2, 6);
+		var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
+		var pmaterial = new Physijs.createMaterial(material,0.9,0.05);
+		pmaterial.visible = false;
+		var mesh = new Physijs.BoxMesh( geometry, pmaterial );
+		mesh.setDamping(0.1,0.1);
+		mesh.castShadow = true;
+
+		var particleMaterial = new THREE.MeshBasicMaterial();
+		particleMaterial.map = THREE.ImageUtils.loadTexture('../models/Rabbit_D.jpg');
+		particleMaterial.side = THREE.DoubleSide;
+		var jsonLoader = new THREE.JSONLoader();
+		jsonLoader.load( "models/rabbit.js", function (geometry2) {
+		var rabbit = new THREE.Mesh(geometry2, particleMaterial);
+		rabbit.scale.set(2,2,2);
+		mesh.add(rabbit);
+		}
+		);
+		return mesh;
+	}
+
+	function addRabbits(){
+		var rabbits = 5;
+		for(i=0;i<rabbits;i++){
+			var rabbit = createRabbits();
+			rabbit.position.set(randN(90)+10,1,randN(40)+10);
+			scene.add(rabbit);
+		}
+	}
+
+
 
 	var clock;
 
@@ -702,7 +728,7 @@ The user moves a monkey around the board trying to knock balls into a cone
 
 	function keydown(event){
 		console.log("Keydown:"+event.key);
-		//console.dir(event);
+		// console.dir(event);
 		// first we handle the "play again" key in the "youwon" scene
 		if ((gameState.scene == 'youwon'||gameState.scene == 'lose')&& event.key=='r') {
 				gameState.scene = 'start';
@@ -720,7 +746,7 @@ The user moves a monkey around the board trying to knock balls into a cone
 		if (gameState.scene == 'youlose' && event.key=='r') {
 			gameState.scene = 'main';
 			gameState.score = 0;
-			addSheeps();
+			addSheep();
 			return;
 		}
 
@@ -734,12 +760,21 @@ The user moves a monkey around the board trying to knock balls into a cone
 			case "r": controls.up = true; break;
 			case "f": controls.down = true; break;
 			case "m": controls.speed = 30; break;
-      			case " ": controls.fly = true; break;
-      			case "h": controls.reset = true; break;
-						case "x": avatar.rotation.set(0,0,0);
-						avatar.__dirtyRotation = true;
-						console.dir(avatar.rotation);
-						break;
+      case " ": controls.fly = true; break;
+      case "h": controls.reset = true; break;
+			case "x": avatar.rotation.set(0,0,0);
+								avatar.__dirtyRotation = true;
+								console.dir(avatar.rotation); break;
+
+			//dog barks, repels fox to save some time to push the sheep
+			case "b": soundEffect('dogBarking.wav');
+								//fox.setLinearVelocity(0); break;
+								//fox.__dirtyPosition = true; break;
+								if (cube.position.distanceTo(avatar.position) < 30){
+									repelFox();
+								}
+								//console.log("Fox Repeled");
+								break;
 
 
 			// switch cameras
@@ -779,13 +814,27 @@ The user moves a monkey around the board trying to knock balls into a cone
 		  //npc.__dirtyPosition = true;
 		npc.setLinearVelocity(npc.getWorldDirection().multiplyScalar(0.8));
 	}
+	// function updateSheep(){
+	// 	//	sheep.lookAt(avatar.position);
+	// 	sheep.setLinearVelocity(10,0,0);
+	// }
+
 
 	function updateCube(){
 		cube.lookAt(avatar.position);
 		  //npc.__dirtyPosition = true;
-		cube.setLinearVelocity(cube.getWorldDirection().multiplyScalar(3));
+		cube.setLinearVelocity(cube.getWorldDirection().multiplyScalar(2.5));
 	}
 
+	//repels the fox
+	function repelFox(){
+		cube.lookAt(avatar.position);
+		//npc.__dirtyPosition = true;
+		//cube.setLinearVelocity(cube.getWorldDirection().multiplyScalar(0));
+		cube.translateZ(-5);
+		cube.__dirtyPosition = true;
+		//console.log("Fox Speed adjust");
+	}
 
   function updateAvatar(){
 		"change the avatar's linear or angular velocity based on controls state (set by WSAD key presses)"
@@ -807,9 +856,12 @@ The user moves a monkey around the board trying to knock balls into a cone
     }
 
 		if (controls.left){
-			avatar.setAngularVelocity(new THREE.Vector3(0,controls.speed*0.1,0));
+			avatar.rotateY(0.02);
+			avatar.__dirtyRotation = true;
 		} else if (controls.right){
-			avatar.setAngularVelocity(new THREE.Vector3(0,-controls.speed*0.1,0));
+			avatar.rotateY(-0.02);
+			avatar.__dirtyRotation = true;
+			//avatar.setAngularVelocity(new THREE.Vector3(0,1,0));
 		}
 
     if (controls.reset){
@@ -820,7 +872,7 @@ The user moves a monkey around the board trying to knock balls into a cone
 	}
 
 
-
+//var step = 0;
 	function animate() {
 
 		requestAnimationFrame( animate );
@@ -841,15 +893,20 @@ The user moves a monkey around the board trying to knock balls into a cone
 			case "main":
 				updateAvatar();
 				updateCube();
-				//updateNPC();
+				//updateSheep();
+
 	    	scene.simulate();
 				if (gameState.camera!= 'none'){
 					renderer.render( scene, gameState.camera );
 					camera3.lookAt(avatar.position);
 				}
+
 				if (npc.position.distanceTo(avatar.position) < 20){
 					updateNPC();
 				}
+
+
+
 				///check the distance to a one sheep
 				// if (cube.position.distanceTo(avatar.position) < 20){
 				// 	updateCube();
