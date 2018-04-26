@@ -17,15 +17,10 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 
 	//var cone;
 	var box;
-<<<<<<< HEAD
-	var sheep;
+
+	var rabbit;
 	var numSheep;
-	//var sheepArr = [];  ///*******
-=======
-	var sheep, rabbit;
-	var numSheeps;
 	var sheepArr = [];  ///*******
->>>>>>> 4fa4caf62cc311d8bb767fa4be6c17b25a0361ba
 
 
 	var endScene, endCamera, endText;
@@ -148,8 +143,9 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 			// create the avatar
 			avatarCam = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 1000 );
 			avatar = createAvatar();
+
 			avatar.rotateY(3);
-			avatar.position.set(5,1,5);
+			avatar.position.set(1,2,10);
 			avatarCam.translateY(2);
 			avatarCam.translateZ(5);
 
@@ -164,7 +160,7 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 			box.position.set(60,0,20);
 			//box.rotateX(Math.PI/2);
 			scene.add(box);
-		
+
 			addRabbits();
 
 			// npc = createNPC();
@@ -220,11 +216,11 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 	function addSheep(){
 		numSheep = 15;
 		for(i=0;i<numSheep;i++){
-			sheep = createSheep();
-			sheep.position.set(randN(90),0.5,randN(-50));
-			scene.add(sheep);
+			sheepArr = createSheep();
+			sheepArr.position.set(randN(80),1,randN(-60));
+			scene.add(sheepArr);
 
-			sheep.addEventListener( 'collision',
+			sheepArr.addEventListener( 'collision',
 				function( other_object, relative_velocity, relative_rotation, contact_normal ) {
 					if (other_object==cube){ //when fox hits sheep
 						console.log("sheep "+i+" hit the box");
@@ -246,7 +242,7 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 			)
 
 			//Sheeps hitting the house
-				sheep.addEventListener( 'collision',
+				sheepArr.addEventListener( 'collision',
 				function( other_object, relative_velocity, relative_rotation, contact_normal ) {
 					if (other_object==box){
 						console.log("sheep "+i+" hit the box");
@@ -524,7 +520,7 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 					// var scoop = createBoxMesh2(0xff0000,5,1,0.1);
 					// scoop.position.set(0,-1,2);
 					// mesh.add(scoop);
-		      mesh.position.set(40,10,40);
+		       mesh.position.set(40,10,40);
 					return mesh;
 	}
 
@@ -590,9 +586,10 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 
 	function createSheep(){
 
-	var geometry = new THREE.BoxGeometry( 6, 1, 6);
+	var geometry = new THREE.BoxGeometry( 2, 2, 4);
+	geometry.translate(0,2,0);
 	var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
-	var pmaterial = new Physijs.createMaterial(material,0.9,0.01);
+	var pmaterial = new Physijs.createMaterial(material,0.95,0.05);
 	pmaterial.visible = false;
 	var mesh = new Physijs.BoxMesh( geometry, pmaterial );
 	mesh.setDamping(0.1,0.1);
@@ -612,7 +609,7 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 	return mesh;
 
 }
-		
+
 		function createRabbits(){
 		var geometry = new THREE.BoxGeometry( 2, 2, 6);
 		var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
@@ -636,10 +633,10 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 	}
 
 	function addRabbits(){
-		var rabbits = 20;
+		var rabbits = 5;
 		for(i=0;i<rabbits;i++){
 			var rabbit = createRabbits();
-			rabbit.position.set(randN(40)+10,1,randN(40)+10);
+			rabbit.position.set(randN(90)+10,1,randN(40)+10);
 			scene.add(rabbit);
 		}
 	}
