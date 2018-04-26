@@ -159,6 +159,8 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 			box.position.set(60,0,20);
 			//box.rotateX(Math.PI/2);
 			scene.add(box);
+		
+			addRabbits();
 
 			// npc = createNPC();
 			// npc.position.set(20,1,10);
@@ -432,6 +434,37 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 		return mesh;
 		// we need to rotate the mesh 90 degrees to make it horizontal not vertical
 	}
+
+	function createRabbits(){
++		var geometry = new THREE.BoxGeometry( 2, 2, 6);
++		var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
++		var pmaterial = new Physijs.createMaterial(material,0.9,0.05);
++		pmaterial.visible = false;
++		var mesh = new Physijs.BoxMesh( geometry, pmaterial );
++		mesh.setDamping(0.1,0.1);
++		mesh.castShadow = true;
++
++		var particleMaterial = new THREE.MeshBasicMaterial();
++		particleMaterial.map = THREE.ImageUtils.loadTexture('../models/Rabbit_D.jpg');
++		particleMaterial.side = THREE.DoubleSide;
++		var jsonLoader = new THREE.JSONLoader();
++		jsonLoader.load( "models/rabbit.js", function (geometry2) {
++		var rabbit = new THREE.Mesh(geometry2, particleMaterial);
++		rabbit.scale.set(2,2,2);
++		mesh.add(rabbit);
++		}
++		);
++		return mesh;
++	}
++			
++	function addRabbits(){
++		var rabbits = 20;
++		for(i=0;i<rabbits;i++){
++			var rabbit = createRabbits();
++			rabbit.position.set(randN(40)+10,1,randN(40)+10);
++			scene.add(rabbit);
++		}
++	}
 
 
 
