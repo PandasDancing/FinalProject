@@ -18,8 +18,8 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 	//var cone;
 	var box;
 	var sheep;
-	var numSheeps;
-	var sheepArr = [];  ///*******
+	var numSheep;
+	//var sheepArr = [];  ///*******
 
 
 	var endScene, endCamera, endText;
@@ -44,7 +44,7 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 	// Here is the main game control
   init(); //
 	initControls();
-	console.log("PA03!");
+	console.log("Final Project!");
 	animate();  // start the animation loop!
 
 
@@ -133,18 +133,17 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 			 scene.add(ground);
 
 			var skybox = createSkyBox();
-			//var skybox = createSkyBox3();
 			skybox.translateY(500);
 			scene.add(skybox);
 
 			var ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.8);// better light
 			scene.add(ambientLight);
-			//createSkyBox3();
+
 			// create the avatar
 			avatarCam = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 1000 );
 			avatar = createAvatar();
 			avatar.rotateY(3);
-			//avatar.position.set(200,100,100);
+			avatar.position.set(5,1,5);
 			avatarCam.translateY(2);
 			avatarCam.translateZ(5);
 
@@ -152,7 +151,7 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 			//bug: change back to avatar cam
 			scene.add(avatar);
 			gameState.camera = avatarCam;
-			addSheeps();
+			addSheep();
 
 			//cone = createConeMesh(4,6);
 			box = createBoxMesh(10,8);
@@ -169,7 +168,7 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
       if (other_object==avatar){
 						//updates the health if avatar obj is touch by the NPC obj
 						gameState.health --;
-						 if (gameState.health==0) {
+						 if (gameState.health == 0) {
 							console.log("way to lose 2222");
 						 	gameState.scene='youlose'; //2nd way to lose: npc touches avatar too many times
 						 }
@@ -185,8 +184,7 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 			//cube.position.set(20,0,-20);
 			cube.position.set(randN(20)+10,0.5,randN(20)+10);
 			cube.addEventListener('collision',function(other_object){
-				//for (var i = 0; i<sheepArr.length; i++){  ///*******
-					  // var position + new THREE.Vector3( 0, 1, 0 );
+
 			      if (other_object==avatar){
 									//updates the health if avatar obj is touch by the NPC obj
 									gameState.health --;
@@ -210,27 +208,26 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 		return Math.random()*n;
 	}
 
+//the Cube in this function is the FOX
+	function addSheep(){
+		numSheep = 15;
+		for(i=0;i<numSheep;i++){
+			sheep = createSheep();
+			sheep.position.set(randN(90),0.5,randN(-50));
+			scene.add(sheep);
 
-	function addSheeps(){
-		numSheeps = 12;
-		for(i=0;i<numSheeps;i++){
-			sheepArr = createSheeps();
-			sheepArr.position.set(randN(90),0.5,randN(-50));
-			//sheepArr.push(sheep); ///*******
-			scene.add(sheepArr);
-
-			sheepArr.addEventListener( 'collision',
+			sheep.addEventListener( 'collision',
 				function( other_object, relative_velocity, relative_rotation, contact_normal ) {
 					if (other_object==cube){ //when fox hits sheep
 						console.log("sheep "+i+" hit the box");
 						console.log("FOXSHEEP 222");
 						soundEffect('sheep-bleat.wav');
 						gameState.score -= 1;  // when fox eats sheep minus one to the score
-						if (gameState.score==-5) {
+						if (gameState.score == -5) {
 							console.log("Way to lose 11111");
 							gameState.scene='youlose'; //1st way of losing: fox eats too many sheep
 						}
-						scene.remove(this);  //why not disapearing??
+						scene.remove(this);
 						// make the ball drop below the scene ..
 						// threejs doesn't let us remove it from the schene...
 
@@ -241,7 +238,7 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 			)
 
 			//Sheeps hitting the house
-					sheepArr.addEventListener( 'collision',
+				sheep.addEventListener( 'collision',
 				function( other_object, relative_velocity, relative_rotation, contact_normal ) {
 					if (other_object==box){
 						console.log("sheep "+i+" hit the box");
@@ -334,8 +331,6 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 		return light;
 	}
 
-
-
 	function createBoxMesh(color){
 		var geometry = new THREE.BoxGeometry( 1, 1, 1);
 		var material = new THREE.MeshLambertMaterial( { color: color} );
@@ -344,8 +339,6 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 		mesh.castShadow = true;
 		return mesh;
 	}
-
-
 
 	function createGround(){
 		// creating a textured plane which receives shadows
@@ -392,7 +385,7 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 			mesh.add(s);
 		}
 		);
-		trunk=createInvisibleBox(5,5,5);
+		trunk=createInvisibleBox(5,10,5);
 		trunk.translateX(24);
 		trunk.translateZ(-25);
 		scene.add(trunk);
@@ -426,8 +419,6 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 		mt2.translateZ(40);
 		mt2.rotateY(-0.2);
 		scene.add(mt2);
-
-
 
 		return mesh;
 		// we need to rotate the mesh 90 degrees to make it horizontal not vertical
@@ -488,6 +479,7 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 	//to stuff the tree trunk and mountains
 	function createInvisibleBox(w,h,d){
 		var geometry = new THREE.BoxGeometry( w, h, d);
+		//geometry.translate();
 		var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
 		var pmaterial = new Physijs.createMaterial(material,0,0);
 		pmaterial.visible = false;
@@ -498,11 +490,13 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 	}
 
 	function createAvatar(){
-					var geometry = new THREE.BoxGeometry( 4, 4, 6);
+					var geometry = new THREE.BoxGeometry( 4, 4, 7);
+					geometry.translate( 0.2, 0, 2);
 					var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
 					var pmaterial = new Physijs.createMaterial(material,0.9,0.01);
 					pmaterial.visible = false;
 					var mesh = new Physijs.BoxMesh( geometry, pmaterial );
+
 					mesh.setDamping(0.1,0.1);
 					mesh.castShadow = true;
 
@@ -516,9 +510,8 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 					particleMaterial.side = THREE.DoubleSide;
 					var jsonLoader = new THREE.JSONLoader();
 					jsonLoader.load( "models/dog.js", function (geometry2) {
-						var dog = new THREE.Mesh(geometry2, particleMaterial);
-						//dog.scale.set(1000,1000,1000);
-						mesh.add(dog);
+					var dog = new THREE.Mesh(geometry2, particleMaterial);
+					mesh.add(dog);
 					}
 				  );
 					// var scoop = createBoxMesh2(0xff0000,5,1,0.1);
@@ -529,14 +522,19 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 	}
 
 	function createEnemy(){
-					var geometry = new THREE.BoxGeometry( 6, 6, 8,);
+					var geometry = new THREE.BoxGeometry( 4, 4, 6,);
+					geometry.translate( 0, 0, 4);
 					var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
 					var pmaterial = new Physijs.createMaterial(material,0.9,0.05);
+
 					pmaterial.visible = false;
 					var mesh = new Physijs.BoxMesh( geometry, pmaterial );
-					mesh.setDamping(0.1,0.1);
+					//mesh.setDamping(0.1,0.1);
 					mesh.castShadow = true;
-					//mesh.position.set(0,2,0);
+					//var center = geometry.getCenter();
+					//mesh.__dirtyPosition = ;
+					//center.translateX(10);
+										//mesh.position.set(0,2,0);
 					// avatarCam.position.set(0,8,0);
 					// avatarCam.lookAt(0,7,10);
 					// mesh.add(avatarCam);
@@ -556,11 +554,12 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 
 		//safety house
 		function createBoxMesh(r,h){
+
 		var geometry = new THREE.BoxGeometry( r, h, 26);
+		geometry.translate(0,0,3);
 		var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
 		var pmaterial = new Physijs.createMaterial(material,0.9,0.05);
 		pmaterial.visible = false;
-
 		var mesh = new Physijs.BoxMesh( geometry, pmaterial, 0);
 		mesh.setDamping(0.1,0.1);
 		mesh.castShadow = true;
@@ -572,6 +571,7 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 		var jsonLoader = new THREE.JSONLoader();
 		jsonLoader.load( "../models/Farmhouse.js", function (geometry2) {
 		var box = new THREE.Mesh(geometry2, particleMaterial);
+			box.__dirtyPosition = true;
 		//box.scale.set(50,50,50);
 		box.scale.set(.5,.5,.5);
 		mesh.add(box);
@@ -581,7 +581,7 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 		return mesh;
 	}
 
-	function createSheeps(){
+	function createSheep(){
 
 	var geometry = new THREE.BoxGeometry( 6, 1, 6);
 	var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
@@ -640,7 +640,7 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 		if (gameState.scene == 'youlose' && event.key=='r') {
 			gameState.scene = 'main';
 			gameState.score = 0;
-			addSheeps();
+			addSheep();
 			return;
 		}
 
@@ -708,6 +708,10 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 		  //npc.__dirtyPosition = true;
 		npc.setLinearVelocity(npc.getWorldDirection().multiplyScalar(0.8));
 	}
+	// function updateSheep(){
+	// 	//	sheep.lookAt(avatar.position);
+	// 	sheep.setLinearVelocity(10,0,0);
+	// }
 
 
 	function updateCube(){
@@ -762,7 +766,7 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 	}
 
 
-
+//var step = 0;
 	function animate() {
 
 		requestAnimationFrame( animate );
@@ -782,15 +786,18 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 			case "main":
 				updateAvatar();
 				updateCube();
-				//updateNPC();
+				//updateSheep();
+
 	    	scene.simulate();
 				if (gameState.camera!= 'none'){
 					renderer.render( scene, gameState.camera );
 					camera3.lookAt(avatar.position);
 				}
+
 				if (npc.position.distanceTo(avatar.position) < 20){
 					updateNPC();
 				}
+
 
 
 				///check the distance to a one sheep
