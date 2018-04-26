@@ -12,7 +12,11 @@ The user moves a monkey around the board trying to knock balls into a cone
 	var camera, avatarCam, camera3;  // we have two cameras in the main scene
 	var avatar;
 	var enemy;
+	var camerax;
 	// here are some mesh objects ...
+	var tick = 0, clock = new THREE.Clock(),container
+	//, gui = new dat.GUI( { width: 350 } ),
+	var	options, spawnerOptions, particleSystem, stats, control;
 
 	//var cone;
 	var box;
@@ -116,6 +120,15 @@ The user moves a monkey around the board trying to knock balls into a cone
 			camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 1000 );
 			camera.position.set(0,50,0);
 			camera.lookAt(0,0,0);
+			camera.updateProjectionMatrix();
+
+			particleSystem = new THREE.GPUParticleSystem( {
+				maxParticles: 250000
+			} );
+			scene.add( particleSystem );
+			console.log("added particle")
+			initSprown();
+
 
 			camera3 = new THREE.PerspectiveCamera( 120, window.innerWidth / window.innerHeight, 0.1, 1000 );
 			camera3.position.set(20,20,30);
@@ -203,6 +216,45 @@ The user moves a monkey around the board trying to knock balls into a cone
 
 	}
 
+  function initSprown() {
+		console.log("init sprown")
+		options = {
+				position: new THREE.Vector3(),
+				positionRandomness: .3,
+				velocity: new THREE.Vector3(),
+				velocityRandomness: .5,
+				color: 0xaa88ff,
+				colorRandomness: .2,
+				turbulence: .5,
+				lifetime: 2,
+				size: 5,
+				sizeRandomness: 1
+			};
+			spawnerOptions = {
+				spawnRate: 15000,
+				horizontalSpeed: 1.5,
+				verticalSpeed: 1.33,
+				timeScale: 1
+			};
+
+			stats = new Stats();
+			control = new THREE.TrackballControls( camera, renderer.domElement );
+			control.rotateSpeed = 5.0;
+			control.zoomSpeed = 2.2;
+			control.panSpeed = 1;
+			control.dynamicDampingFactor = 0.3;
+
+			window.addEventListener( 'resize', onWindowResize, false );
+	}
+
+	function onWindowResize() {
+
+		camera.aspect = window.innerWidth / window.innerHeight;
+		camera.updateProjectionMatrix();
+
+		renderer.setSize( window.innerWidth, window.innerHeight );
+
+	}
 
 	function randN(n){
 		return Math.random()*n;
@@ -314,6 +366,7 @@ The user moves a monkey around the board trying to knock balls into a cone
 		document.body.appendChild( renderer.domElement );
 		renderer.shadowMap.enabled = true;
 		renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+		renderer.setPixelRatio( window.devicePixelRatio );
 	}
 
 
@@ -772,6 +825,7 @@ The user moves a monkey around the board trying to knock balls into a cone
 
 		requestAnimationFrame( animate );
 		dragcontrols.update();
+		renderer.render( scene, camera );
 
 		switch(gameState.scene) {
 			case "youwon":
@@ -800,6 +854,23 @@ The user moves a monkey around the board trying to knock balls into a cone
 				// if (cube.position.distanceTo(avatar.position) < 20){
 				// 	updateCube();
 				// }
+				control.update();
+				var delta = clock.getDelta() * spawnerOptions.timeScale;
+					tick += delta;
+					if ( tick < 0 ) tick = 0;
+					if ( delta > 0 ) {
+						options.position.x = Math.sin( tick * spawnerOptions.horizontalSpeed ) * 20;
+						options.position.y = Math.sin( tick * spawnerOptions.verticalSpeed ) * 10;
+						options.position.z = Math.sin( tick * spawnerOptions.horizontalSpeed + spawnerOptions.verticalSpeed ) * 5;
+						for ( var x = 0; x < spawnerOptions.spawnRate * delta; x++ ) {
+							// Yep, that's really it.	Spawning particles is super cheap, and once you spawn them, the rest of
+							// their lifecycle is handled entirely on the GPU, driven by a time uniform updated below
+							particleSystem.spawnParticle( options );
+						}
+					}
+					particleSystem.update( tick );
+
+					stats.update();
 				break;
 
 			case "start":
