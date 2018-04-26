@@ -13,12 +13,18 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 	var camera, avatarCam, camera3;  // we have two cameras in the main scene
 	var avatar;
 	var enemy;
+	var camerax;
+	var cerca;
 	// here are some mesh objects ...
+	var tick = 0, clock = new THREE.Clock(),container
+	//, gui = new dat.GUI( { width: 350 } ),
+	var	options, spawnerOptions, particleSystem, stats, control;
 
 	//var cone;
 	var box;
-	var sheep;
-	var numSheeps;
+
+	var rabbit;
+	var numSheep;
 	var sheepArr = [];  ///*******
 
 
@@ -44,7 +50,7 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 	// Here is the main game control
   init(); //
 	initControls();
-	console.log("PA03!");
+	console.log("Final Project!");
 	animate();  // start the animation loop!
 
 
@@ -117,6 +123,15 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 			camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 1000 );
 			camera.position.set(0,50,0);
 			camera.lookAt(0,0,0);
+			camera.updateProjectionMatrix();
+
+			particleSystem = new THREE.GPUParticleSystem( {
+				maxParticles: 250000
+			} );
+			scene.add( particleSystem );
+			console.log("added particle")
+			initSprown();
+
 
 			camera3 = new THREE.PerspectiveCamera( 120, window.innerWidth / window.innerHeight, 0.1, 1000 );
 			camera3.position.set(20,20,30);
@@ -133,18 +148,18 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 			 scene.add(ground);
 
 			var skybox = createSkyBox();
-			//var skybox = createSkyBox3();
 			skybox.translateY(500);
 			scene.add(skybox);
 
 			var ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.8);// better light
 			scene.add(ambientLight);
-			//createSkyBox3();
+
 			// create the avatar
 			avatarCam = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 1000 );
 			avatar = createAvatar();
+
 			avatar.rotateY(3);
-			//avatar.position.set(200,100,100);
+			avatar.position.set(20,2,15);
 			avatarCam.translateY(2);
 			avatarCam.translateZ(5);
 
@@ -152,7 +167,7 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 			//bug: change back to avatar cam
 			scene.add(avatar);
 			gameState.camera = avatarCam;
-			addSheeps();
+			addSheep();
 
 			//cone = createConeMesh(4,6);
 			box = createBoxMesh(10,8);
@@ -160,33 +175,37 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 			//box.rotateX(Math.PI/2);
 			scene.add(box);
 
-			// npc = createNPC();
-			// npc.position.set(20,1,10);
-			// scene.add(npc);
-			npc = createBoxMesh2(0x0000ff,2,2,2);
-			npc.position.set(20,5,-20);
-      npc.addEventListener('collision',function(other_object){
-      if (other_object==avatar){
-						//updates the health if avatar obj is touch by the NPC obj
-						gameState.health --;
-						 if (gameState.health==0) {
-							console.log("way to lose 2222");
-						 	gameState.scene='youlose'; //2nd way to lose: npc touches avatar too many times
-						 }
-						//Teleport the NPC obj to a random position
-						npc.__dirtyPosition = true;
-						npc.position.set(randN(50)-25,30,randN(50)-25);//Random
+			var cerca1 = createCerca();
+			cerca1.position.set(75,0,22);
+			scene.add(cerca1);
 
-						        }
-						      })
-		  scene.add(npc);
+			var cerca2 = createCerca();
+			cerca2.position.set(75,0,27);
+			scene.add(cerca2);
+
+			var cerca3 = createCerca();
+			cerca3.position.set(75,0,32);
+			scene.add(cerca3);
+
+			var cerca4 = createCerca();
+			cerca4.position.set(74,0,33);
+			cerca4.rotateY(Math.PI/2);
+			scene.add(cerca4);
+
+			var cerca5 = createCerca();
+			cerca5.position.set(69,0,33);
+			cerca5.rotateY(Math.PI/2);
+			scene.add(cerca5);
+
+
+			addRabbits();
+
 
 			cube = createEnemy();
 			//cube.position.set(20,0,-20);
-			cube.position.set(randN(20)+10,0.5,randN(20)+10);
+			cube.position.set(randN(30)+10,0.5,randN(20)+10);
 			cube.addEventListener('collision',function(other_object){
-				//for (var i = 0; i<sheepArr.length; i++){  ///*******
-					  // var position + new THREE.Vector3( 0, 1, 0 );
+
 			      if (other_object==avatar){
 									//updates the health if avatar obj is touch by the NPC obj
 									gameState.health --;
@@ -205,19 +224,58 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 
 	}
 
+  function initSprown() {
+		console.log("init sprown")
+		options = {
+				position: new THREE.Vector3(),
+				positionRandomness: .3,
+				velocity: new THREE.Vector3(),
+				velocityRandomness: .5,
+				color: 0xaa88ff,
+				colorRandomness: .2,
+				turbulence: .5,
+				lifetime: 2,
+				size: 5,
+				sizeRandomness: 1
+			};
+			spawnerOptions = {
+				spawnRate: 15000,
+				horizontalSpeed: 1.5,
+				verticalSpeed: 1.33,
+				timeScale: 1
+			};
+
+			stats = new Stats();
+			control = new THREE.TrackballControls( camera, renderer.domElement );
+			control.rotateSpeed = 5.0;
+			control.zoomSpeed = 2.2;
+			control.panSpeed = 1;
+			control.dynamicDampingFactor = 0.3;
+
+			window.addEventListener( 'resize', onWindowResize, false );
+	}
+
+	function onWindowResize() {
+
+		camera.aspect = window.innerWidth / window.innerHeight;
+		camera.updateProjectionMatrix();
+
+		renderer.setSize( window.innerWidth, window.innerHeight );
+
+	}
 
 	function randN(n){
 		return Math.random()*n;
 	}
 
-
-	function addSheeps(){
-		numSheeps = 12;
-		for(i=0;i<numSheeps;i++){
-			sheepArr = createSheeps();
-			sheepArr.position.set(randN(90),0.5,randN(-50));
-			//sheepArr.push(sheep); ///*******
+//the Cube in this function is the FOX
+	function addSheep(){
+		numSheep = 15;
+		for(i=0;i<numSheep;i++){
+			sheepArr = createSheep();
+			sheepArr.position.set(randN(80),1,randN(-60));
 			scene.add(sheepArr);
+			console.log(sheepArr.length);
 
 			sheepArr.addEventListener( 'collision',
 				function( other_object, relative_velocity, relative_rotation, contact_normal ) {
@@ -226,11 +284,11 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 						console.log("FOXSHEEP 222");
 						soundEffect('sheep-bleat.wav');
 						gameState.score -= 1;  // when fox eats sheep minus one to the score
-						if (gameState.score==-5) {
+						if (gameState.score == -5) {
 							console.log("Way to lose 11111");
 							gameState.scene='youlose'; //1st way of losing: fox eats too many sheep
 						}
-						scene.remove(this);  //why not disapearing??
+						scene.remove(this);
 						// make the ball drop below the scene ..
 						// threejs doesn't let us remove it from the schene...
 
@@ -241,7 +299,7 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 			)
 
 			//Sheeps hitting the house
-					sheepArr.addEventListener( 'collision',
+				sheepArr.addEventListener( 'collision',
 				function( other_object, relative_velocity, relative_rotation, contact_normal ) {
 					if (other_object==box){
 						console.log("sheep "+i+" hit the box");
@@ -319,6 +377,7 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 		document.body.appendChild( renderer.domElement );
 		renderer.shadowMap.enabled = true;
 		renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+		renderer.setPixelRatio( window.devicePixelRatio );
 	}
 
 
@@ -334,8 +393,6 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 		return light;
 	}
 
-
-
 	function createBoxMesh(color){
 		var geometry = new THREE.BoxGeometry( 1, 1, 1);
 		var material = new THREE.MeshLambertMaterial( { color: color} );
@@ -344,8 +401,6 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 		mesh.castShadow = true;
 		return mesh;
 	}
-
-
 
 	function createGround(){
 		// creating a textured plane which receives shadows
@@ -376,6 +431,12 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 			s.scale.set( 0.4, 0.4, 0.4 );
 			s.position.set(25,-25,-15);
 			mesh.add(s);
+
+			var y = new THREE.Mesh(geometry2, particleMaterial);
+			y.rotateX(Math.PI/2*3);
+			y.scale.set( 0.4, 0.4, 0.4 );
+			y.position.set(105,10,-15);
+			mesh.add(y);
 		}
 		);
 
@@ -390,12 +451,23 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 			s.scale.set( 0.1, 0.1, 0.1 );
 			s.position.set(25,-25,0);
 			mesh.add(s);
+
+			var y = new THREE.Mesh(geometry2, particleMaterial2);
+			y.rotateX(Math.PI/2*3);
+			y.scale.set( 0.1, 0.1, 0.1 );
+			y.position.set(105,10,0);
+			mesh.add(y);
 		}
 		);
-		trunk=createInvisibleBox(5,5,5);
+		trunk=createInvisibleBox(5,10,5);
 		trunk.translateX(24);
 		trunk.translateZ(-25);
 		scene.add(trunk);
+
+		trunkTwo = createInvisibleBox(5,10,5);
+		trunkTwo.translateX(105);
+		trunkTwo.translateZ(10);
+		scene.add(trunkTwo);
 
 		//mountains
 		var particleMaterial3 = new THREE.MeshBasicMaterial();
@@ -427,12 +499,9 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 		mt2.rotateY(-0.2);
 		scene.add(mt2);
 
-
-
 		return mesh;
 		// we need to rotate the mesh 90 degrees to make it horizontal not vertical
 	}
-
 
 
 	function createSkyBox(){
@@ -488,6 +557,7 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 	//to stuff the tree trunk and mountains
 	function createInvisibleBox(w,h,d){
 		var geometry = new THREE.BoxGeometry( w, h, d);
+		//geometry.translate();
 		var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
 		var pmaterial = new Physijs.createMaterial(material,0,0);
 		pmaterial.visible = false;
@@ -498,11 +568,13 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 	}
 
 	function createAvatar(){
-					var geometry = new THREE.BoxGeometry( 4, 4, 6);
+					var geometry = new THREE.BoxGeometry( 4, 4, 7);
+					geometry.translate( 0.2, 0, 2);
 					var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
 					var pmaterial = new Physijs.createMaterial(material,0.9,0.01);
 					pmaterial.visible = false;
 					var mesh = new Physijs.BoxMesh( geometry, pmaterial );
+
 					mesh.setDamping(0.1,0.1);
 					mesh.castShadow = true;
 
@@ -516,27 +588,56 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 					particleMaterial.side = THREE.DoubleSide;
 					var jsonLoader = new THREE.JSONLoader();
 					jsonLoader.load( "models/dog.js", function (geometry2) {
-						var dog = new THREE.Mesh(geometry2, particleMaterial);
-						//dog.scale.set(1000,1000,1000);
-						mesh.add(dog);
+					var dog = new THREE.Mesh(geometry2, particleMaterial);
+					mesh.add(dog);
 					}
 				  );
 					// var scoop = createBoxMesh2(0xff0000,5,1,0.1);
 					// scoop.position.set(0,-1,2);
 					// mesh.add(scoop);
-		      mesh.position.set(40,10,40);
+		       //mesh.position.set(20,10,40);
+					return mesh;
+	}
+
+
+	function createCerca(){
+					var geometry = new THREE.BoxGeometry( 2, 2, 1);
+					//geometry.translate( 0, 0, 2);
+					var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
+					var pmaterial = new Physijs.createMaterial(material,0.9,0.01);
+					pmaterial.visible = false;
+					var mesh = new Physijs.BoxMesh( geometry, pmaterial, 0 );
+					mesh.setDamping(0.1,0.1);
+					mesh.castShadow = true;
+
+					var particleMaterial = new THREE.MeshBasicMaterial();
+					particleMaterial.map = THREE.ImageUtils.loadTexture('../models/TreeMat.jpg');
+					particleMaterial.side = THREE.DoubleSide;
+					var jsonLoader = new THREE.JSONLoader();
+					jsonLoader.load( "../models/cerca.js", function (geometry2) {
+					var cerca = new THREE.Mesh(geometry2, particleMaterial);
+					cerca.scale.set(1,1,1);
+					mesh.add(cerca);
+					}
+				  );
+		      //mesh.position.set(-40,5,10);
 					return mesh;
 	}
 
 	function createEnemy(){
-					var geometry = new THREE.BoxGeometry( 6, 6, 8,);
+					var geometry = new THREE.BoxGeometry( 4, 4, 6,);
+					geometry.translate( 0, 0, 4);
 					var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
 					var pmaterial = new Physijs.createMaterial(material,0.9,0.05);
+
 					pmaterial.visible = false;
 					var mesh = new Physijs.BoxMesh( geometry, pmaterial );
-					mesh.setDamping(0.1,0.1);
+					//mesh.setDamping(0.1,0.1);
 					mesh.castShadow = true;
-					//mesh.position.set(0,2,0);
+					//var center = geometry.getCenter();
+					//mesh.__dirtyPosition = ;
+					//center.translateX(10);
+										//mesh.position.set(0,2,0);
 					// avatarCam.position.set(0,8,0);
 					// avatarCam.lookAt(0,7,10);
 					// mesh.add(avatarCam);
@@ -556,11 +657,12 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 
 		//safety house
 		function createBoxMesh(r,h){
+
 		var geometry = new THREE.BoxGeometry( r, h, 26);
+		geometry.translate(0,0,3);
 		var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
 		var pmaterial = new Physijs.createMaterial(material,0.9,0.05);
 		pmaterial.visible = false;
-
 		var mesh = new Physijs.BoxMesh( geometry, pmaterial, 0);
 		mesh.setDamping(0.1,0.1);
 		mesh.castShadow = true;
@@ -572,6 +674,7 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 		var jsonLoader = new THREE.JSONLoader();
 		jsonLoader.load( "../models/Farmhouse.js", function (geometry2) {
 		var box = new THREE.Mesh(geometry2, particleMaterial);
+			box.__dirtyPosition = true;
 		//box.scale.set(50,50,50);
 		box.scale.set(.5,.5,.5);
 		mesh.add(box);
@@ -581,11 +684,12 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 		return mesh;
 	}
 
-	function createSheeps(){
+	function createSheep(){
 
-	var geometry = new THREE.BoxGeometry( 6, 1, 6);
+	var geometry = new THREE.BoxGeometry( 4, 3, 4);
+	geometry.translate(0,1,0);
 	var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
-	var pmaterial = new Physijs.createMaterial(material,0.9,0.01);
+	var pmaterial = new Physijs.createMaterial(material,.8,0.05);
 	pmaterial.visible = false;
 	var mesh = new Physijs.BoxMesh( geometry, pmaterial );
 	mesh.setDamping(0.1,0.1);
@@ -605,6 +709,38 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 	return mesh;
 
 }
+
+		function createRabbits(){
+		var geometry = new THREE.BoxGeometry( 2, 2, 6);
+		var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
+		var pmaterial = new Physijs.createMaterial(material,0.9,0.05);
+		pmaterial.visible = false;
+		var mesh = new Physijs.BoxMesh( geometry, pmaterial );
+		mesh.setDamping(0.1,0.1);
+		mesh.castShadow = true;
+
+		var particleMaterial = new THREE.MeshBasicMaterial();
+		particleMaterial.map = THREE.ImageUtils.loadTexture('../models/Rabbit_D.jpg');
+		particleMaterial.side = THREE.DoubleSide;
+		var jsonLoader = new THREE.JSONLoader();
+		jsonLoader.load( "models/rabbit.js", function (geometry2) {
+		var rabbit = new THREE.Mesh(geometry2, particleMaterial);
+		rabbit.scale.set(2,2,2);
+		mesh.add(rabbit);
+		}
+		);
+		return mesh;
+	}
+
+	function addRabbits(){
+		var rabbits = 5;
+		for(i=0;i<rabbits;i++){
+			var rabbit = createRabbits();
+			rabbit.position.set(randN(90)+10,1,randN(40)+10);
+			scene.add(rabbit);
+		}
+	}
+
 
 
 	var clock;
@@ -640,7 +776,7 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 		if (gameState.scene == 'youlose' && event.key=='r') {
 			gameState.scene = 'main';
 			gameState.score = 0;
-			addSheeps();
+			addSheep();
 			return;
 		}
 
@@ -708,12 +844,16 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 		  //npc.__dirtyPosition = true;
 		npc.setLinearVelocity(npc.getWorldDirection().multiplyScalar(0.8));
 	}
+	// function updateSheep(){
+	// 	//	sheep.lookAt(avatar.position);
+	// 	sheep.setLinearVelocity(10,0,0);
+	// }
 
 
 	function updateCube(){
 		cube.lookAt(avatar.position);
 		  //npc.__dirtyPosition = true;
-		cube.setLinearVelocity(cube.getWorldDirection().multiplyScalar(2.5));
+		cube.setLinearVelocity(cube.getWorldDirection().multiplyScalar(2.0));
 	}
 
 	//repels the fox
@@ -762,11 +902,12 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 	}
 
 
-
+//var step = 0;
 	function animate() {
 
 		requestAnimationFrame( animate );
 		dragcontrols.update();
+		renderer.render( scene, camera );
 
 		switch(gameState.scene) {
 			case "youwon":
@@ -782,21 +923,41 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 			case "main":
 				updateAvatar();
 				updateCube();
-				//updateNPC();
+				//updateSheep();
+
 	    	scene.simulate();
 				if (gameState.camera!= 'none'){
 					renderer.render( scene, gameState.camera );
 					camera3.lookAt(avatar.position);
 				}
+
 				if (npc.position.distanceTo(avatar.position) < 20){
 					updateNPC();
 				}
+
 
 
 				///check the distance to a one sheep
 				// if (cube.position.distanceTo(avatar.position) < 20){
 				// 	updateCube();
 				// }
+				control.update();
+				var delta = clock.getDelta() * spawnerOptions.timeScale;
+					tick += delta;
+					if ( tick < 0 ) tick = 0;
+					if ( delta > 0 ) {
+						options.position.x = Math.sin( tick * spawnerOptions.horizontalSpeed ) * 20;
+						options.position.y = Math.sin( tick * spawnerOptions.verticalSpeed ) * 10;
+						options.position.z = Math.sin( tick * spawnerOptions.horizontalSpeed + spawnerOptions.verticalSpeed ) * 5;
+						for ( var x = 0; x < spawnerOptions.spawnRate * delta; x++ ) {
+							// Yep, that's really it.	Spawning particles is super cheap, and once you spawn them, the rest of
+							// their lifecycle is handled entirely on the GPU, driven by a time uniform updated below
+							particleSystem.spawnParticle( options );
+						}
+					}
+					particleSystem.update( tick );
+
+					stats.update();
 				break;
 
 			case "start":
