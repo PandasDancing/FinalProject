@@ -931,9 +931,6 @@ User also can use key "4" to drag the scene to see the setting of our game (skyb
 					camera3.lookAt(avatar.position);
 				}
 
-				if (npc.position.distanceTo(avatar.position) < 20){
-					updateNPC();
-				}
 
 
 
